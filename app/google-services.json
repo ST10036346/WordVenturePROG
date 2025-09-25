@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "31461357043",
+    "project_id": "wordventure2",
+    "storage_bucket": "wordventure2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31461357043:android:28f76d09370df790b88e86",
+        "android_client_info": {
+          "package_name": "com.st10036346.wordventure2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "31461357043-vlmudd2av5l8mli7g9hfer9ufs2r3ukt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.st10036346.wordventure2",
+            "certificate_hash": "864fb032fde4d892e10b2449a01ed733a1fbc9b9"
+          }
+        },
+        {
+          "client_id": "31461357043-iidq1leossncui679ta7irhsk32smuct.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9G4ZYhfEfTOBBWLC7DVIhsLXHmksbJxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "31461357043-iidq1leossncui679ta7irhsk32smuct.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
