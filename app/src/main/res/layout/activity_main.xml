@@ -1,19 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#E8E8D9"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp"
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/welcome_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="WELCOME TO"
+        android:textColor="#3D3B51"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_width="168dp"
+        android:layout_height="149dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="100dp"
+        android:contentDescription="Word Venture Logo"
+        android:src="@drawable/logo1" />
+
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:background="@drawable/rounded_button"
+        app:backgroundTint="#E2DEF1"
+        android:text="Register"
+        android:textAllCaps="false"
+        android:textColor="#3D3B51"
+        android:textSize="20sp"
+        android:elevation="8dp"/>
+
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/rounded_button"
+        app:backgroundTint="#E2DEF1"
+        android:text="Login"
+        android:textAllCaps="false"
+        android:textColor="#3D3B51"
+        android:textSize="20sp"
+        android:elevation="8dp"/>
+
+</LinearLayout>
