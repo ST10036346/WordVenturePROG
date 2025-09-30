@@ -15,7 +15,6 @@ import com.google.firebase.ktx.Firebase
 
 class Login : AppCompatActivity() {
 
-    // Declare a lateinit property for Firebase Authentication
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +26,6 @@ class Login : AppCompatActivity() {
         val emailEditText = findViewById<EditText>(R.id.email_edit_text)
         val passwordEditText = findViewById<EditText>(R.id.password_edit_text)
         val loginButton = findViewById<Button>(R.id.login_button)
-        val signupLink = findViewById<TextView>(R.id.signup_link)
 
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
@@ -53,11 +51,6 @@ class Login : AppCompatActivity() {
                         Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                     }
                 }
-        }
-
-        signupLink.setOnClickListener {
-            val intent = Intent(this, Register::class.java)
-            startActivity(intent)
         }
     }
 }
