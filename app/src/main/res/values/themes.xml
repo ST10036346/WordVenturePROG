@@ -6,4 +6,18 @@
     </style>
 
     <style name="Theme.WordVenture2" parent="Base.Theme.WordVenture2" />
+
+    <!-- Style for the main action buttons in Settings, based on your design -->
+    <style name="AppButton" parent="Widget.Material3.Button">
+        <item name="android:layout_width">250dp</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:padding">20dp</item>
+        <item name="android:backgroundTint">#9888D7</item>
+        <item name="android:textColor">#051646</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
 </resources>

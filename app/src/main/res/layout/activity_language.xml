@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E5E8DD"
+    tools:context=".LanguageActivity">
+
+    <!-- Header Section (Navigation Bar) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#BEC6FB"
+        android:paddingBottom="1dp"
+        android:paddingTop="1dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/bookIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:src="@android:drawable/ic_menu_back"
+            app:tint="#051646"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Title Text - Language -->
+        <TextView
+            android:id="@+id/languageTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/barriecito"
+            android:gravity="center"
+            android:paddingBottom="12dp"
+            android:paddingTop="12dp"
+            android:text="LANGUAGE"
+            android:textColor="#051646"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/settingsIconContainer"
+            app:layout_constraintStart_toEndOf="@id/bookIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Header Right Icons - Grouped in a LinearLayout -->
+        <LinearLayout
+            android:id="@+id/settingsIconContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Profile Icon - Navigates to Profile Page -->
+            <ImageView
+                android:id="@+id/profileIcon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@mipmap/profile_icon_foreground" />
+
+            <!-- Settings Icon - Navigates to Settings Page -->
+            <ImageView
+                android:id="@+id/settingsIcon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@mipmap/settings_icon_foreground" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Language Options Content Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical"
+        android:paddingBottom="24dp"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout">
+
+
+        <!-- Language 1: English (Selected) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardEnglish"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="24dp"
+            android:backgroundTint="#BCB3DF"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="4dp">
+
+            <!-- Use a LinearLayout to combine the button (for text/click area) and the checkmark -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnEnglish"
+                    style="@style/AppButton"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="English"
+                    android:layout_gravity="center"
+                    android:textSize="25dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Language 2: Afrikaans -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardAfrikaans"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="24dp"
+            android:backgroundTint="#BCB3DF"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="4dp">
+
+            <Button
+                android:id="@+id/btnAfrikaans"
+                style="@style/AppButton"
+                android:layout_marginTop="5dp"
+                android:text="Afrikaans"
+                android:layout_gravity="center"
+                android:textSize="25dp" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Language 3: Zulu -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardZulu"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="24dp"
+            android:backgroundTint="#BCB3DF"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="4dp">
+
+            <Button
+                android:id="@+id/btnZulu"
+                style="@style/AppButton"
+                android:layout_marginTop="5dp"
+                android:text="Zulu"
+                android:layout_gravity="center"
+                android:textSize="25dp" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Language 4: Xhosa -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardXhosa"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="24dp"
+            android:backgroundTint="#BCB3DF"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="4dp">
+
+            <Button
+                android:id="@+id/btnXhosa"
+                style="@style/AppButton"
+                android:layout_marginTop="5dp"
+                android:text="Xhosa"
+                android:layout_gravity="center"
+                android:textSize="25dp" />
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
