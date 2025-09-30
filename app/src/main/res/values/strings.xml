@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">WordVenture2</string>
+
+    <string name="placeholder_friend_1">GamerOne77</string>
+    <string name="placeholder_friend_2">Awesome_Pal</string>
+    <string name="placeholder_friend_3">LexiConqueror</string>
+
+    <string name="discover_who_is_online">Discover who is online:</string>
+    <string name="friends">Friends</string>
+
+    <string-array name="language_options">
+        <item>English</item>
+        <item>Afrikaans</item>
+        <item>Zulu</item>
+    </string-array>
 </resources>
