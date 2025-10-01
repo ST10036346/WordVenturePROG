@@ -129,8 +129,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         app:showText="false"
-                        app:textOff=""
-                        app:textOn=""
                         app:thumbTint="#FFFFFF"
                         app:trackTint="#6750A4" />
 
@@ -172,8 +170,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         app:showText="false"
-                        app:textOff=""
-                        app:textOn=""
                         app:thumbTint="#FFFFFF"
                         app:trackTint="#6750A4" />
 
@@ -191,7 +187,7 @@
             </androidx.cardview.widget.CardView>
 
 
-    </LinearLayout>
+        </LinearLayout>
 
         <!-- Main Buttons -->
         <!-- Edit Profile Button Card -->
@@ -227,7 +223,7 @@
                 android:layout_marginTop="5dp"
                 android:text="Language"
                 android:layout_gravity="center" />
-            />
+
         </androidx.cardview.widget.CardView>
 
         <!-- Help & Support Button Card -->

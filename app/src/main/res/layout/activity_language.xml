@@ -17,6 +17,7 @@
         android:paddingTop="1dp"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- Title Text - Language -->
         <ImageView
             android:id="@+id/bookIcon"
             android:layout_width="50dp"
@@ -24,15 +25,14 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:src="@android:drawable/ic_menu_back"
-            app:tint="#051646"
+            android:paddingEnd="8dp"
+            android:src="?attr/homeAsUpIndicator"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#051646" />
 
-        <!-- Title Text - Language -->
         <TextView
             android:id="@+id/languageTitle"
             android:layout_width="0dp"

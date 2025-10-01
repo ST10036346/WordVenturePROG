@@ -30,6 +30,9 @@
             android:exported="false" />
 
         <activity
+            android:name=".Daily1"
+            android:exported="true" />
+        <activity
             android:name=".MainMenu"
             android:exported="false" />
 
