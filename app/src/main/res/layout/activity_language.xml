@@ -122,8 +122,9 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginLeft="10dp"
                     android:text="English"
+                    android:fontFamily="@font/comic_relief"
                     android:layout_gravity="center"
-                    android:textSize="25dp"/>
+                    android:textSize="23dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -143,8 +144,9 @@
                 style="@style/AppButton"
                 android:layout_marginTop="5dp"
                 android:text="Afrikaans"
+                android:fontFamily="@font/comic_relief"
                 android:layout_gravity="center"
-                android:textSize="25dp" />
+                android:textSize="23dp" />
         </androidx.cardview.widget.CardView>
 
         <!-- Language 3: Zulu -->
@@ -163,8 +165,9 @@
                 style="@style/AppButton"
                 android:layout_marginTop="5dp"
                 android:text="Zulu"
+                android:fontFamily="@font/comic_relief"
                 android:layout_gravity="center"
-                android:textSize="25dp" />
+                android:textSize="23dp" />
         </androidx.cardview.widget.CardView>
 
         <!-- Language 4: Xhosa -->
@@ -183,8 +186,9 @@
                 style="@style/AppButton"
                 android:layout_marginTop="5dp"
                 android:text="Xhosa"
+                android:fontFamily="@font/comic_relief"
                 android:layout_gravity="center"
-                android:textSize="25dp" />
+                android:textSize="23dp" />
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>
