@@ -141,7 +141,8 @@
                         android:text="Dark Mode"
                         android:textColor="#051646"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:fontFamily="@font/comic_relief" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -180,6 +181,7 @@
                         android:gravity="end"
                         android:paddingEnd="16dp"
                         android:text="Sound"
+                        android:fontFamily="@font/comic_relief"
                         android:textColor="#051646"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -204,6 +206,7 @@
                 style="@style/AppButton"
                 android:layout_marginTop="5dp"
                 android:text="Edit Profile"
+                android:fontFamily="@font/comic_relief"
                 android:layout_gravity="center" />
         </androidx.cardview.widget.CardView>
 
@@ -222,6 +225,7 @@
                 style="@style/AppButton"
                 android:layout_marginTop="5dp"
                 android:text="Language"
+                android:fontFamily="@font/comic_relief"
                 android:layout_gravity="center" />
 
         </androidx.cardview.widget.CardView>
@@ -241,6 +245,7 @@
                 style="@style/AppButton"
                 android:layout_marginTop="5dp"
                 android:text="Help &amp; Support"
+                android:fontFamily="@font/comic_relief"
                 android:layout_gravity="center"
                 />
         </androidx.cardview.widget.CardView>

@@ -16,10 +16,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="WELCOME TO"
-        android:textColor="#3D3B51"
-        android:textSize="24sp"
+        android:textColor="#051646"
+        android:textSize="30sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-condensed"/>
+        android:fontFamily="@font/barriecito"/>
 
     <ImageView
         android:id="@+id/logo_image"
@@ -35,11 +35,13 @@
         android:layout_width="200dp"
         android:layout_height="60dp"
         android:background="@drawable/rounded_button"
-        app:backgroundTint="#E2DEF1"
+        app:backgroundTint="#9888D7"
         android:text="Register"
+        android:fontFamily="@font/comic_relief"
+        android:textStyle="bold"
         android:textAllCaps="false"
-        android:textColor="#3D3B51"
-        android:textSize="20sp"
+        android:textColor="#051646"
+        android:textSize="25sp"
         android:elevation="8dp"/>
 
     <Button
@@ -48,11 +50,13 @@
         android:layout_height="60dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/rounded_button"
-        app:backgroundTint="#E2DEF1"
+        app:backgroundTint="#9888D7"
         android:text="Login"
+        android:fontFamily="@font/comic_relief"
+        android:textStyle="bold"
         android:textAllCaps="false"
-        android:textColor="#3D3B51"
-        android:textSize="20sp"
+        android:textColor="#051646"
+        android:textSize="25sp"
         android:elevation="8dp"/>
 
 </LinearLayout>

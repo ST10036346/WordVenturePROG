@@ -8,13 +8,14 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="#E8E8D9"
-    android:padding="24dp"
-    tools:context=".MainActivity">
+    tools:context=".Register">
 
+    <!-- Title -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -22,21 +23,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="REGISTER"
-            android:textAlignment="center"
-            android:layout_marginStart="8dp"
-            android:textColor="#3D3B51"
-            android:textSize="32sp"
+            android:textColor="#051646"
+            android:textSize="40sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"/>
-
+            android:fontFamily="@font/barriecito"/>
     </LinearLayout>
 
+    <!-- Card with input fields -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         android:layout_marginHorizontal="16dp"
+        android:layout_margin="30dp"
         app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
@@ -45,56 +45,81 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <!-- Username -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Username"
-                android:textColor="#3D3B51"
+                android:fontFamily="@font/comic_relief"
+                android:textColor="#051646"
+                android:textSize="17dp"
                 android:layout_marginBottom="8dp"/>
             <EditText
-                android:id="@+id/username_edit_text" android:layout_width="match_parent"
+                android:id="@+id/username_edit_text"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/rounded_edit_text"
                 android:hint="Username"
+                android:fontFamily="@font/comic_relief"
                 android:paddingHorizontal="16dp"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#E2DEF1"
+                tools:ignore="Autofill" />
 
+            <!-- Email -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:textColor="#3D3B51"
+                android:fontFamily="@font/comic_relief"
+                android:textColor="#051646"
+                android:textSize="17dp"
                 android:layout_marginBottom="8dp"/>
             <EditText
-                android:id="@+id/email_edit_text" android:layout_width="match_parent"
+                android:id="@+id/email_edit_text"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/rounded_edit_text"
                 android:hint="Email"
+                android:fontFamily="@font/comic_relief"
                 android:paddingHorizontal="16dp"
                 android:inputType="textEmailAddress"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#E2DEF1"
+                tools:ignore="Autofill" />
 
+            <!-- Password -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Password"
-                android:textColor="#3D3B51"
+                android:fontFamily="@font/comic_relief"
+                android:textColor="#051646"
+                android:textSize="17dp"
                 android:layout_marginBottom="8dp"/>
             <EditText
-                android:id="@+id/password_edit_text" android:layout_width="match_parent"
+                android:id="@+id/password_edit_text"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/rounded_edit_text"
                 android:hint="Password"
+                android:fontFamily="@font/comic_relief"
                 android:paddingHorizontal="16dp"
                 android:inputType="textPassword"
+                android:drawableTint="#808080"
                 android:drawablePadding="16dp"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#E2DEF1"
+                tools:ignore="Autofill" />
 
+            <!-- Language -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Language"
-                android:textColor="#3D3B51"
+                android:fontFamily="@font/comic_relief"
+                android:textColor="#051646"
+                android:textSize="17dp"
                 android:layout_marginBottom="8dp"/>
             <Spinner
                 android:id="@+id/language_spinner"
@@ -102,32 +127,27 @@
                 android:layout_height="50dp"
                 android:background="@drawable/rounded_edit_text"
                 android:entries="@array/language_options"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                style="@style/Widget.AppCompat.Spinner.Underlined"/>
+                android:backgroundTint="#E2DEF1"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Register button -->
     <Button
-        android:id="@+id/signup_button" android:layout_width="200dp"
-        android:layout_height="60dp"
+        android:id="@+id/signup_button"
+        android:layout_width="200dp"
+        android:layout_height="70dp"
         android:layout_marginTop="32dp"
         android:background="@drawable/rounded_button"
         app:backgroundTint="#E2DEF1"
         android:text="Register"
+        android:fontFamily="@font/comic_relief"
         android:textAllCaps="false"
-        android:textColor="#3D3B51"
-        android:textSize="20sp"
+        android:textColor="#051646"
+        android:textStyle="bold"
+        android:textSize="30sp"
         android:elevation="8dp"/>
-
-    <TextView
-        android:id="@+id/login_link"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Already registered? Login"
-        android:textColor="#555555"
-        android:textSize="16sp"/>
 
 </LinearLayout>
