@@ -55,22 +55,25 @@ class Register : AppCompatActivity() {
                                 "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
                             )
 
+                            // 1. ATTEMPT TO SAVE DATA TO FIRESTORE (Non-blocking for redirection)
                             db.collection("users").document(userId)
                                 .set(userData)
                                 .addOnSuccessListener {
-                                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
-                                    Log.d("Firestore", "User data added with ID: $userId")
-
-                                    val intent = Intent(this, Login::class.java)
-                                    startActivity(intent)
-                                    finish()
+                                    Log.d("Firestore", "User data added successfully.")
                                 }
                                 .addOnFailureListener { e ->
-                                    Toast.makeText(this, "Failed to save user data: ${e.message}", Toast.LENGTH_LONG).show()
-                                    Log.w("Firestore", "Error writing document", e)
+                                    // Log the failure, but the user is still authenticated and we navigate
+                                    Log.w("Firestore", "Error writing document, continuing navigation.", e)
                                 }
+
+                            // 2. IMMEDIATE REDIRECTION TO MainActivity AFTER SUCCESSFUL FIREBASE AUTH
+                            Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
                         }
                     } else {
+                        // Registration failed (e.g., weak password, email already in use)
                         Toast.makeText(this, "Registration failed: ${authTask.exception?.message}", Toast.LENGTH_LONG).show()
                         Log.e("Firebase", "createUserWithEmail:failure", authTask.exception)
                     }

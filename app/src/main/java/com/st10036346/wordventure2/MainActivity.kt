@@ -19,14 +19,14 @@ class MainActivity : AppCompatActivity() {
 
         // 2. Set the click listener for the Register button
         registerButton.setOnClickListener {
-            // Create an Intent to start the RegisterActivity
+            // ACTION: Direct the user to the Register page
             val intent = Intent(this, Register::class.java)
             startActivity(intent)
         }
 
         // 3. Set the click listener for the Login button
         loginButton.setOnClickListener {
-            // Create an Intent to start the LoginActivity
+            // ACTION: Direct the user to the Login page
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
         }
