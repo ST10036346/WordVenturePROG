@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E8E8D9"
+    tools:context=".Muliplayer">
+
+    <!-- Header Section -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#BEC6FB"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/bookIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@mipmap/wordventure_logo_foreground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/multiplayerTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/barriecito"
+            android:gravity="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:text="MULTIPLAYER"
+            android:textColor="#051646"
+            android:textSize="31sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/settingsIconContainer"
+            app:layout_constraintStart_toEndOf="@id/bookIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/settingsIconContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/profileIcon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@mipmap/profile_icon_foreground" />
+
+            <ImageView
+                android:id="@+id/settingsIcon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@mipmap/settings_icon_foreground" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Main Content: Vertically Centered -->
+    <TextView
+        android:id="@+id/promptText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/barriecito"
+        android:gravity="center"
+        android:text="Play local or start an\ninstant match"
+        android:textColor="#051646"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/localMatchButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_bias="0.4"/>
+
+    <Button
+        android:id="@+id/localMatchButton"
+        android:layout_width="250dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#C9BFFB"
+        android:fontFamily="@font/barriecito"
+        android:text="Local Match"
+        android:textColor="#051646"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/randomMatchButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/promptText" />
+
+    <Button
+        android:id="@+id/randomMatchButton"
+        android:layout_width="250dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#C9BFFB"
+        android:fontFamily="@font/barriecito"
+        android:text="Random Match"
+        android:textColor="#051646"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/localMatchButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
