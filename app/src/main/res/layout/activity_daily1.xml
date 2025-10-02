@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E8E8D9"
-    tools:context=".Daily1Activity">
+    tools:context=".Daily1">
 
     <!-- Header Section -->
     <androidx.constraintlayout.widget.ConstraintLayout
