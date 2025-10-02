@@ -171,4 +171,21 @@
     </LinearLayout>
 
 
+    <FrameLayout
+        android:id="@+id/stats_panel_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:translationY="800dp"
+        android:visibility="invisible">
+
+    <include
+        android:id="@+id/stats_panel"
+        layout="@layout/stats_panel" />
+
+</FrameLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

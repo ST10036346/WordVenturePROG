@@ -4,63 +4,60 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
-import android.widget.Button
-import android.widget.GridLayout
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.st10036346.wordventure2.databinding.ActivityDaily1Binding
 
 class Daily1 : AppCompatActivity() {
-    private lateinit var boardGrid: GridLayout
+
+    // 1. Declare the binding variable. This will replace findViewById for all layout views.
+    private lateinit var binding: ActivityDaily1Binding
+
+    // 2. Class-level properties for game state.
     private val rows = 6
     private val cols = 5
-    private val tiles = Array(rows) { Array<TextView?>(cols) { null } }
-
+    private val tiles = Array(rows) { arrayOfNulls<TextView>(cols) }
     private var currentRow = 0
     private var currentCol = 0
-
-    private val targetWord = "EARTH"
+    private var targetWord = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_daily1)
 
-        boardGrid = findViewById(R.id.boardGrid)
+        // 3. Inflate the layout using View Binding and set the content view.
+        binding = ActivityDaily1Binding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.keyboardLayout.visibility = View.INVISIBLE // Use INVISIBLE to keep layout space
+
+        // 4. Call the setup functions.
+        fetchWordleWord()
         setupBoard()
         setupKeyboard()
-
-
-
     }
 
-
     private fun setupBoard() {
-        // A single, corrected loop to create exactly 30 tiles
         for (i in 0 until rows) {
             for (j in 0 until cols) {
                 val tile = TextView(this).apply {
-                    // Set the size and margins for each tile
-                    layoutParams = GridLayout.LayoutParams().apply {
-                        width = 230 // You can adjust this size as needed
+                    layoutParams = android.widget.GridLayout.LayoutParams().apply {
+                        width = 230 // Consider moving this to a dimens.xml file
                         height = 230
                         setMargins(2, 2, 2, 2)
                     }
-
-                    // Set the visual properties of the tile
                     text = ""
                     gravity = Gravity.CENTER
-                    textSize = 32f // Use a consistent text size
+                    textSize = 32f
                     setTextColor(Color.BLACK)
                     setTypeface(null, Typeface.BOLD)
-
-                    // Apply the border drawable you created
                     background = ContextCompat.getDrawable(this@Daily1, R.drawable.tile_border)
                 }
 
-                // Add the fully configured tile to the grid
-                boardGrid.addView(tile)
-                // Store the reference to THIS tile in the array
+                // Use the binding object to access the boardGrid
+                binding.boardGrid.addView(tile)
                 tiles[i][j] = tile
             }
         }
@@ -80,81 +77,110 @@ class Daily1 : AppCompatActivity() {
         }
     }
 
-    // In Daily1.kt
     private fun onEnterPressed() {
         if (currentCol != cols) {
             Toast.makeText(this, "Not enough letters", Toast.LENGTH_SHORT).show()
             return
         }
 
-        var guess = ""
-        for (j in 0 until cols) {
-            guess += tiles[currentRow][j]?.text.toString()
+        val guess = (0 until cols).joinToString("") { j ->
+            tiles[currentRow][j]?.text.toString()
         }
 
-        // --- Start of New Logic ---
-
-        // A mutable list of the letters in the target word that are available for yellow matches.
         val availableTargetLetters = targetWord.toMutableList()
-        // An array to store the final color of each tile. Initialize all to gray.
         val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Gray
 
-        // First Pass: Find all correct letters in the correct position (Greens)
+        // First Pass: Greens
         for (j in 0 until cols) {
-            val tile = tiles[currentRow][j]
-            val letter = guess[j]
-
-            if (letter == targetWord[j]) {
+            if (guess[j] == targetWord[j]) {
                 tileColors[j] = Color.parseColor("#6AAA64") // Green
-                // Mark this letter as "used" so it can't be used for a yellow match.
-                // Replacing with a placeholder character is a simple way to do this.
                 availableTargetLetters[j] = ' '
             }
         }
 
-        // Second Pass: Find correct letters in the wrong position (Yellows)
+        // Second Pass: Yellows
         for (j in 0 until cols) {
-            val tile = tiles[currentRow][j]
-            val letter = guess[j]
-
-            // Only check tiles that are not already green
             if (tileColors[j] != Color.parseColor("#6AAA64")) {
-                if (availableTargetLetters.contains(letter)) {
+                if (availableTargetLetters.contains(guess[j])) {
                     tileColors[j] = Color.parseColor("#C9B458") // Yellow
-                    // Mark this letter as "used" from the available list.
-                    availableTargetLetters[availableTargetLetters.indexOf(letter)] = ' '
+                    availableTargetLetters[availableTargetLetters.indexOf(guess[j])] = ' '
                 }
             }
         }
 
-        // Apply the colors determined in the two passes
+        // Apply colors
         for (j in 0 until cols) {
-            val tile = tiles[currentRow][j]
-            tile?.setBackgroundColor(tileColors[j])
-            tile?.setTextColor(Color.WHITE)
+            tiles[currentRow][j]?.apply {
+                setBackgroundColor(tileColors[j])
+                setTextColor(Color.WHITE)
+            }
         }
 
-        // --- End of New Logic ---
-
-        // 4. Check for win/loss and move to the next row (this part remains the same)
+        // Check for win/loss
         if (guess.equals(targetWord, ignoreCase = true)) {
-            Toast.makeText(this, "You won!", Toast.LENGTH_LONG).show()
-            // You could disable the keyboard here
+            showStatsPanel(didWin = true)
             return
         }
 
-        // Move to the next row
         currentRow++
         currentCol = 0
 
         if (currentRow >= rows) {
-            Toast.makeText(this, "Game Over! The word was $targetWord", Toast.LENGTH_LONG).show()
-            // You could disable the keyboard here
+            showStatsPanel(didWin = false)
         }
     }
 
+    private fun setupKeyboard() {
+        // A map of Button Views to the character they represent, using View Binding
+        val buttonMap = mapOf(
+            binding.buttonQ to 'Q', binding.buttonW to 'W', binding.buttonE to 'E',
+            binding.buttonR to 'R', binding.buttonT to 'T', binding.buttonY to 'Y',
+            binding.buttonU to 'U', binding.buttonI to 'I', binding.buttonO to 'O',
+            binding.buttonP to 'P', binding.buttonA to 'A', binding.buttonS to 'S',
+            binding.buttonD to 'D', binding.buttonF to 'F', binding.buttonG to 'G',
+            binding.buttonH to 'H', binding.buttonJ to 'J', binding.buttonK to 'K',
+            binding.buttonL to 'L', binding.buttonZ to 'Z', binding.buttonX to 'X',
+            binding.buttonC to 'C', binding.buttonV to 'V', binding.buttonB to 'B',
+            binding.buttonN to 'N', binding.buttonM to 'M'
+        )
 
+        for ((button, letter) in buttonMap) {
+            button.setOnClickListener { onLetterPressed(letter) }
+        }
 
+        // Set listeners for Enter and Delete using View Binding
+        binding.buttonEnter.setOnClickListener { onEnterPressed() }
+        binding.buttonDelete.setOnClickListener { onBackPressedCustom() }
+    }
+
+    private fun showStatsPanel(didWin: Boolean) {
+        // Hide the keyboard
+        binding.keyboardLayout.visibility = View.GONE
+
+        // Get the title TextView from the included layout via the binding object.
+        // For this to work, you must have an id on your <include> tag in activity_daily1.xml.
+        // I am assuming it is: android:id="@+id/stats_panel"
+        val statsTitle = binding.statsPanel.statsTitle
+
+        if (didWin) {
+            statsTitle.text = "CONGRATULATIONS!"
+        } else {
+            statsTitle.text = "NEXT TIME!"
+            Toast.makeText(this@Daily1, "WORD WAS: " + targetWord, Toast.LENGTH_LONG).show()
+
+        }
+
+        // TODO: Update the rest of the stats values using binding.statsPanel.your_view_id
+
+        // Animate the panel into view
+        binding.statsPanelContainer.visibility = View.VISIBLE
+        binding.statsPanelContainer.animate()
+            .translationY(0f)
+            .setDuration(500)
+            .start()
+    }
+
+    // This function is not currently used, but is good practice to keep if needed later.
     private fun setTile(row: Int, col: Int, letter: Char, color: Int) {
         tiles[row][col]?.apply {
             text = if (letter == ' ') "" else letter.toString()
@@ -162,32 +188,33 @@ class Daily1 : AppCompatActivity() {
         }
     }
 
-    private fun setupKeyboard() {
-        // A map of Button IDs to the character they represent
-        val buttonIdToChar = mapOf(
-            R.id.button_q to 'Q', R.id.button_w to 'W', R.id.button_e to 'E',
-            R.id.button_r to 'R', R.id.button_t to 'T', R.id.button_y to 'Y',
-            R.id.button_u to 'U', R.id.button_i to 'I', R.id.button_o to 'O',
-            R.id.button_p to 'P', R.id.button_a to 'A', R.id.button_s to 'S',
-            R.id.button_d to 'D', R.id.button_f to 'F', R.id.button_g to 'G',
-            R.id.button_h to 'H', R.id.button_j to 'J', R.id.button_k to 'K',
-            R.id.button_l to 'L', R.id.button_z to 'Z', R.id.button_x to 'X',
-            R.id.button_c to 'C', R.id.button_v to 'V', R.id.button_b to 'B',
-            R.id.button_n to 'N', R.id.button_m to 'M'
-        )
+    private fun fetchWordleWord() {
+        RetrofitClient.instance.getRandomWord().enqueue(object : retrofit2.Callback<WordResponse> {
+            override fun onResponse(call: retrofit2.Call<WordResponse>, response: retrofit2.Response<WordResponse>) {
 
-        // Loop through the map to set up each button
-        for ((buttonId, letter) in buttonIdToChar) {
-            findViewById<Button>(buttonId).setOnClickListener {
-                onLetterPressed(letter)
+
+                binding.keyboardLayout.visibility = View.VISIBLE
+
+                if (response.isSuccessful) {
+                    // Update the targetWord with the fetched word
+                    // Use a fallback word like "APPLE" if the response is null
+                    val randomWord = response.body()!!.word
+                    targetWord = randomWord.uppercase() // IMPORTANT: Ensure the word is uppercase
+
+                }
+                else {
+                    // Handle cases where the server gives an error (e.g., 404, 500)
+                    Toast.makeText(this@Daily1, "Error: Could not fetch a word from the server.", Toast.LENGTH_LONG).show()
+                    targetWord = "ERROR" // Set a fallback word only on server error
+                }
             }
-        }
 
-        findViewById<Button>(R.id.button_enter).setOnClickListener { onEnterPressed() }
-        findViewById<Button>(R.id.button_delete).setOnClickListener { onBackPressedCustom()}
+            override fun onFailure(call: retrofit2.Call<WordResponse>, t: Throwable) {
 
-        // You will also need to handle the Enter and Backspace buttons
-        // findViewById<Button>(R.id.button_enter).setOnClickListener { onEnterPressed() }
-        // findViewById<Button>(R.id.button_backspace).setOnClickListener { onBackPressedCustom() }
+                binding.keyboardLayout.visibility = View.VISIBLE
+                // Handle network failure (no internet, server down, etc.)
+                Toast.makeText(this@Daily1, "Network Error: ${t.message}", Toast.LENGTH_LONG).show()
+            }
+        })
     }
 }
