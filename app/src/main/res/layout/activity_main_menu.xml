@@ -79,7 +79,6 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Content -->
     <LinearLayout
         android:id="@+id/contentLayout"
         android:layout_width="match_parent"
@@ -90,7 +89,6 @@
         app:layout_constraintTop_toBottomOf="@id/headerLayout"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,7 +99,6 @@
             android:fontFamily="@font/barriecito"
             android:layout_marginBottom="40dp" />
 
-        <!-- Daily + Play Buttons Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -116,7 +113,7 @@
                 android:layout_height="90dp"
                 android:layout_weight="1"
                 android:text="Daily"
-                android:fontFamily="@font/comic_relief"
+                android:fontFamily="@font/barriecito"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="#051646"
@@ -129,14 +126,13 @@
                 android:layout_height="90dp"
                 android:layout_weight="1"
                 android:text="Play"
-                android:fontFamily="@font/comic_relief"
+                android:fontFamily="@font/barriecito"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="#051646"
                 app:backgroundTint="#BCB3DF" />
         </LinearLayout>
 
-        <!-- Multiplayer Button -->
         <Button
             android:id="@+id/multiplayerButton"
             android:layout_width="match_parent"
@@ -144,11 +140,165 @@
             android:layout_marginHorizontal="24dp"
             android:layout_marginBottom="32dp"
             android:text="Multiplayer"
-            android:fontFamily="@font/comic_relief"
+            android:fontFamily="@font/barriecito"
             android:textSize="25sp"
             android:textStyle="bold"
             android:textColor="#051646"
             app:backgroundTint="#9889CD" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="#E2DEF1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Friends"
+                    android:textColor="#051646"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/barriecito"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Discover who is online:"
+                    android:textColor="#051646"
+                    android:textSize="14sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#BCB3DF"
+                    android:layout_marginBottom="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="JohnDoeRayMe847"
+                            android:textColor="#051646"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Online"
+                            android:textColor="#00AA00"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="ThanksALotRachel109"
+                            android:textColor="#051646"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Offline"
+                            android:textColor="#555555"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="SamuellJacksonville123"
+                            android:textColor="#051646"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Offline"
+                            android:textColor="#555555"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="AdamOddAndEvens676"
+                            android:textColor="#051646"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Online"
+                            android:textColor="#00AA00"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="KrisIsTuff190"
+                            android:textColor="#051646"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Offline"
+                            android:textColor="#555555"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

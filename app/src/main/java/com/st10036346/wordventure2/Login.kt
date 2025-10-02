@@ -12,8 +12,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-
-
 class Login : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -44,9 +42,10 @@ class Login : AppCompatActivity() {
                         val user = auth.currentUser
                         Toast.makeText(this, "Login successful for ${user?.email}", Toast.LENGTH_SHORT).show()
 
-                        val intent = Intent(this, MainActivity::class.java)
+                        // ⬇️ MODIFIED LINE: Redirect to MainMenu Activity ⬇️
+                        val intent = Intent(this, MainMenu::class.java)
                         startActivity(intent)
-                        finish()
+                        finish() // Prevent the user from going back to the Login screen
                     } else {
                         Log.w("Login", "signInWithEmail:failure", task.exception)
                         Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()

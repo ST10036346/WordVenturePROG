@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:fontFamily="@font/comic_relief"
+                android:fontFamily="@font/barriecito"
                 android:textColor="#051646"
                 android:textSize="17dp"
                 android:layout_marginBottom="8dp"/>
@@ -71,7 +71,7 @@
                 android:text="Password"
                 android:textColor="#051646"
                 android:textSize="17dp"
-                android:fontFamily="@font/comic_relief"
+                android:fontFamily="@font/barriecito"
                 android:layout_marginBottom="8dp"/>
 
             <EditText
@@ -104,7 +104,7 @@
         android:textColor="#051646"
         android:textStyle="bold"
         android:textSize="30sp"
-        android:fontFamily="@font/comic_relief"
+        android:fontFamily="@font/barriecito"
         android:elevation="8dp"/>
 
 </LinearLayout>
