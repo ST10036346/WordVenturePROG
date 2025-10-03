@@ -1,0 +1,6 @@
+<!-- res/drawable/rounded_purple_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#C9BFFB" /> <!-- The light purple color -->
+    <corners android:radius="16dp" />
+</shape>
