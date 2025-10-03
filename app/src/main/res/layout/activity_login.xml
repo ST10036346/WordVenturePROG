@@ -107,4 +107,13 @@
         android:fontFamily="@font/barriecito"
         android:elevation="8dp"/>
 
+    <!-- New Google Sign-In Button -->
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_sign_in_button"
+        android:layout_width="197dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        tools:ignore="MissingConstraints" />
+
 </LinearLayout>
