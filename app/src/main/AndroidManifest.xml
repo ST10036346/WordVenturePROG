@@ -48,6 +48,9 @@
         <activity
             android:name=".ProfileActivity"
             android:exported="true" />
+
+        <service android:name=".BackgroundMusicService" />
+
     </application>
 
 
