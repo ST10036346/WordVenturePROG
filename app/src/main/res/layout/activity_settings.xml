@@ -61,25 +61,23 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <!-- Profile Icon - Navigates to Profile Page -->
             <ImageView
                 android:id="@+id/profileIcon"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@mipmap/profile_icon_foreground"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+                android:src="@mipmap/profile_icon_foreground" />
 
-            <!-- Settings Icon - Navigates to Settings Page (Current Page) -->
             <ImageView
                 android:id="@+id/settingsIcon"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@mipmap/settings_icon_foreground"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+                android:src="@mipmap/settings_icon_foreground" />
 
         </LinearLayout>
 
