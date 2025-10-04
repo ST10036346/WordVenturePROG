@@ -1,5 +1,6 @@
 package com.st10036346.wordventure2
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -37,12 +38,13 @@ class Daily1 : AppCompatActivity() {
     }
     private val keyboardLetterStatus = mutableMapOf<Char, LetterStatus>()
     private lateinit var letterButtonMap: Map<Char, Button>
-    // ------------------------------------
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDaily1Binding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setupNavigation()
 
         setupBoard()
         setupKeyboard() // Initializes letterButtonMap
@@ -50,6 +52,25 @@ class Daily1 : AppCompatActivity() {
         // Hide keyboard until word is fetched
         binding.keyboardLayout.visibility = View.INVISIBLE
         fetchWordleWord()
+    }
+
+    /**
+     * Sets up the functionality for the navigation icons in the header.
+     */
+    private fun setupNavigation() {
+        binding.backIcon.setOnClickListener {
+            finish()
+        }
+
+        binding.profileIcon.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.settingsIcon.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupBoard() {
