@@ -7,7 +7,6 @@
     android:background="#E5E8DD"
     tools:context=".ProfileActivity">
 
-    <!-- Header Section (Navigation Bar) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
@@ -17,7 +16,6 @@
         android:paddingTop="1dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Header Left Icon (Back Arrow) - Navigates back -->
         <ImageView
             android:id="@+id/backIcon"
             android:layout_width="50dp"
@@ -27,13 +25,12 @@
             android:focusable="true"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:src="@android:drawable/ic_menu_back"
+            android:src="?attr/homeAsUpIndicator"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="#051646" />
 
-        <!-- Title Text -->
         <TextView
             android:id="@+id/profileTitle"
             android:layout_width="0dp"
@@ -51,7 +48,6 @@
             app:layout_constraintStart_toEndOf="@id/backIcon"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Header Right Icons -->
         <LinearLayout
             android:id="@+id/profileIconContainer"
             android:layout_width="wrap_content"
@@ -62,17 +58,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Profile Icon (Current Page) -->
-            <ImageView
-                android:id="@+id/profileIcon"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+            <TextView
+                android:id="@+id/logoutButton"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:fontFamily="@font/comic_relief"
+                android:gravity="center"
+                android:paddingBottom="12dp"
+                android:paddingTop="12dp"
+                android:text="LOGOUT"
+                android:textColor="#051646"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/profileTitle"
+                app:layout_constraintStart_toEndOf="@id/settingsIcon"
+                app:layout_constraintTop_toTopOf="parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
-                android:focusable="true"
-                android:src="@mipmap/profile_icon_foreground" />
+                android:focusable="true"/>
 
-            <!-- Settings Icon - Navigates to Settings Page -->
             <ImageView
                 android:id="@+id/settingsIcon"
                 android:layout_width="80dp"
@@ -85,7 +90,6 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Content Section -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/contentConstraintLayout"
         android:layout_width="match_parent"
@@ -97,7 +101,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
-        <!-- 1. Profile Photo Circle Card (Separate and Centered) - Reduced Size -->
         <androidx.cardview.widget.CardView
             android:id="@+id/profilePhotoCard"
             android:layout_width="100dp"
@@ -134,7 +137,6 @@
         </androidx.cardview.widget.CardView>
 
 
-        <!-- 2. & 3. User Info Card Container (White with Dark Blue Border) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/userInfoCardContainer"
             android:layout_width="match_parent"
@@ -149,14 +151,12 @@
             app:strokeColor="#051646"
             app:strokeWidth="2dp">
 
-            <!-- TODO: gotta use user details here -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- 3. Edit Text Card 1: Username (Light Lavender #E2DEF1) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -172,11 +172,11 @@
                         android:background="@android:color/transparent"
                         android:padding="12dp"
                         android:text="TheCharlieBrown320"
+                        android:fontFamily="@font/comic_relief"
                         android:textColor="#051646"
                         android:textSize="16sp" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- 3. Edit Text Card 2: Email (Light Lavender #E2DEF1) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -192,11 +192,11 @@
                         android:background="@android:color/transparent"
                         android:padding="12dp"
                         android:text="charlieroux@gmail.com"
+                        android:fontFamily="@font/comic_relief"
                         android:textColor="#051646"
                         android:textSize="16sp" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- 3. Edit Text Card 3: Password (Light Lavender #E2DEF1) -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -220,7 +220,6 @@
         </com.google.android.material.card.MaterialCardView>
 
 
-        <!-- 4. Statistics Card (Medium Lavender #CECADF with Dark Blue Border) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/statsCard"
             android:layout_width="match_parent"
@@ -235,18 +234,16 @@
             app:strokeColor="#051646"
             app:strokeWidth="2dp">
 
-            <!-- gotta use user stats here -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Stats -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp"
+                    android:layout_marginBottom="16dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -258,10 +255,11 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/gamesPlayedCount"
+                            android:id="@+id/games_played_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="154"
+                            android:text="0"
+                            android:fontFamily="@font/comic_relief"
                             android:textColor="#051646"
                             android:textSize="28sp"
                             android:textStyle="bold" />
@@ -270,6 +268,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Games Played"
+                            android:fontFamily="@font/comic_relief"
                             android:textColor="#051646"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -282,10 +281,11 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/winStreakCount"
+                            android:id="@+id/win_streak_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="32"
+                            android:text="0"
+                            android:fontFamily="@font/comic_relief"
                             android:textColor="#051646"
                             android:textSize="28sp"
                             android:textStyle="bold" />
@@ -294,6 +294,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Win Streak"
+                            android:fontFamily="@font/comic_relief"
                             android:textColor="#051646"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -306,10 +307,11 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/maxStreakCount"
+                            android:id="@+id/max_streak_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="73"
+                            android:text="0"
+                            android:fontFamily="@font/comic_relief"
                             android:textColor="#051646"
                             android:textSize="28sp"
                             android:textStyle="bold" />
@@ -318,29 +320,39 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Max Streak"
+                            android:fontFamily="@font/comic_relief"
                             android:textColor="#051646"
                             android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Guess Distribution (Placeholder) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
                     android:text="Guess Distribution"
+                    android:fontFamily="@font/comic_relief"
                     android:textColor="#051646"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <!-- TODO: gotta make a bar graph for guess distribution -->
-                <View
+                <LinearLayout
+                    android:id="@+id/guess_distribution_chart_container"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_marginTop="8dp"
-                    android:background="#CECADF" />
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:layout_constraintTop_toBottomOf="@id/statsCard"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="1dp"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
