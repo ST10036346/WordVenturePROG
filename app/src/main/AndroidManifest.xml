@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WordVenture2">
         <activity
+            android:name=".LocalMatch"
+            android:exported="false" />
+        <activity
             android:name=".StartMultiplayerMatch"
             android:exported="false" />
         <activity
@@ -48,6 +51,9 @@
         <activity
             android:name=".ProfileActivity"
             android:exported="true" />
+
+        <service android:name=".BackgroundMusicService" />
+
     </application>
 
 

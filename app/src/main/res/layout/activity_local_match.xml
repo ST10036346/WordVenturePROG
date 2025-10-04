@@ -33,7 +33,7 @@
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <TextView
-            android:id="@+id/settingsTitle"
+            android:id="@+id/screenTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="DAILY"
@@ -99,7 +99,6 @@
 
     <!-- Keyboard -->
     <!-- Keyboard -->
-    <!-- In activity_daily1.xml -->
     <LinearLayout
         android:id="@+id/keyboardLayout"
         android:layout_width="0dp"
@@ -170,7 +169,6 @@
 
         </LinearLayout>
     </LinearLayout>
-
 
 
     <FrameLayout

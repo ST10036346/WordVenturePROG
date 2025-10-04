@@ -9,7 +9,6 @@
     android:background="#E8E8D9"
     android:elevation="8dp">
 
-    <!-- Title: "CONGRATULATIONS!" or "NEXT TIME!" -->
     <TextView
         android:id="@+id/stats_title"
         android:layout_width="wrap_content"
@@ -21,7 +20,6 @@
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Main Stats Box -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +29,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp">
 
-        <!-- Top row of stats: Played, Win Streak, Max Streak -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,7 +105,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Guess Distribution Section (Placeholder) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -117,17 +113,17 @@
             android:textColor="#051646"
             android:textSize="14sp"/>
 
-        <ImageView
-            android:id="@+id/guess_distribution_chart"
+        <LinearLayout
+            android:id="@+id/guess_distribution_chart_container"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_marginTop="8dp"
-            android:src="@android:drawable/ic_menu_gallery"
-            android:contentDescription="Guess distribution chart placeholder"/>
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"/>
 
     </LinearLayout>
 
-    <!-- Buttons at the bottom -->
     <Button
         android:id="@+id/play_more_button"
         android:layout_width="250dp"

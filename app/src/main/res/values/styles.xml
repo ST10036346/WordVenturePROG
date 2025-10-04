@@ -1,34 +1,19 @@
 <resources>
-    <style name="WordleTile">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:gravity">center</item>
+    <!-- ... your existing app theme style ... -->
+
+    <!-- NEW: Style for the Wordle keyboard keys -->
+    <style name="Widget.App.Button.LetterKey" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/key_background</item>
+        <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:background">#FFFFFF</item>
-        <item name="android:layout_margin">4dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="backgroundTint">@null</item>
+
+        <!-- NEW & IMPORTANT: Force padding to be zero -->
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
     </style>
-
-    <style name="WordleKey">
-        <item name="android:layout_width">36dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:layout_margin">2dp</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:background">#DDDDDD</item>
-    </style>
-    <!-- In res/values/styles.xml -->
-    <style name="KeyboardButton" parent="Widget.AppCompat.Button">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">60dp</item>
-        <item name="android:layout_margin">2dp</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@android:color/white</item> <!-- Explicitly set to white -->
-        <item name="android:background">@drawable/keyboard_key</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:gravity">center</item>
-        <item name="android:includeFontPadding">false</item>
-    </style>
-
-
-
 </resources>
