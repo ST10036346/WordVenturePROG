@@ -19,7 +19,7 @@
 
         <!-- Title Text - Language -->
         <ImageView
-            android:id="@+id/bookIcon"
+            android:id="@+id/backIcon"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -47,7 +47,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/settingsIconContainer"
-            app:layout_constraintStart_toEndOf="@id/bookIcon"
+            app:layout_constraintStart_toEndOf="@id/backIcon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Header Right Icons - Grouped in a LinearLayout -->
@@ -85,8 +85,24 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Language Options Content Section -->
+    <!-- New Heading: Coming Soon! -->
+    <TextView
+        android:id="@+id/comingSoon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/barriecito"
+        android:text="Coming Soon!"
+        android:textColor="#051646"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout" />
+
+    <!-- Language Options Content Section (now constrained below 'Coming Soon!') -->
     <LinearLayout
+        android:id="@+id/languageOptionsLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="32dp"
@@ -95,7 +111,7 @@
         android:paddingEnd="24dp"
         android:paddingStart="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/headerLayout">
+        app:layout_constraintTop_toBottomOf="@id/comingSoon">
 
 
         <!-- Language 1: English (Selected) -->
@@ -104,7 +120,7 @@
             android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="24dp"
+            android:layout_margin="20dp"
             android:backgroundTint="#BCB3DF"
             app:cardCornerRadius="18dp"
             app:cardElevation="4dp">
@@ -134,7 +150,7 @@
             android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="24dp"
+            android:layout_margin="20dp"
             android:backgroundTint="#BCB3DF"
             app:cardCornerRadius="18dp"
             app:cardElevation="4dp">
@@ -155,7 +171,7 @@
             android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="24dp"
+            android:layout_margin="20dp"
             android:backgroundTint="#BCB3DF"
             app:cardCornerRadius="18dp"
             app:cardElevation="4dp">
@@ -176,7 +192,7 @@
             android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="24dp"
+            android:layout_margin="20dp"
             android:backgroundTint="#BCB3DF"
             app:cardCornerRadius="18dp"
             app:cardElevation="4dp">
