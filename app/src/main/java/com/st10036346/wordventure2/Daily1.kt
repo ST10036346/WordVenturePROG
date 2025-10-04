@@ -3,12 +3,16 @@ package com.st10036346.wordventure2
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.st10036346.wordventure2.databinding.ActivityDaily1Binding
 import retrofit2.Call
 import retrofit2.Callback
@@ -25,17 +29,26 @@ class Daily1 : AppCompatActivity() {
     private var currentCol = 0
     private var targetWord = "" // Will be fetched from API
 
+    // --- Keyboard State Management ---
+    private enum class LetterStatus {
+        CORRECT, // Green
+        PRESENT, // Yellow
+        ABSENT   // Gray
+    }
+    private val keyboardLetterStatus = mutableMapOf<Char, LetterStatus>()
+    private lateinit var letterButtonMap: Map<Char, Button>
+    // ------------------------------------
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDaily1Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupBoard()
-        setupKeyboard()
+        setupKeyboard() // Initializes letterButtonMap
 
-        // Hide keyboard and show loader until word is fetched
+        // Hide keyboard until word is fetched
         binding.keyboardLayout.visibility = View.INVISIBLE
-
         fetchWordleWord()
     }
 
@@ -59,14 +72,14 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun onLetterPressed(letter: Char) {
-        if (currentCol < cols) {
+        if (currentCol < cols && binding.keyboardLayout.isEnabled) {
             tiles[currentRow][currentCol]?.text = letter.toString()
             currentCol++
         }
     }
 
     private fun onBackPressedCustom() {
-        if (currentCol > 0) {
+        if (currentCol > 0 && binding.keyboardLayout.isEnabled) {
             currentCol--
             tiles[currentRow][currentCol]?.text = ""
         }
@@ -80,19 +93,20 @@ class Daily1 : AppCompatActivity() {
 
         val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }
 
-        // Color logic
-        val availableTargetLetters = targetWord.toMutableList()
+        // --- Grid Color Logic ---
+        val availableTargetLettersForGrid = targetWord.toMutableList()
         val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Gray
         for (j in 0 until cols) {
             if (guess[j] == targetWord[j]) {
-                tileColors[j] = Color.parseColor("#6AAA64"); availableTargetLetters[j] = ' '
+                tileColors[j] = Color.parseColor("#6AAA64") // Green
+                availableTargetLettersForGrid[j] = ' '
             }
         }
         for (j in 0 until cols) {
             if (tileColors[j] != Color.parseColor("#6AAA64")) {
-                if (availableTargetLetters.contains(guess[j])) {
-                    tileColors[j] = Color.parseColor("#C9B458")
-                    availableTargetLetters[availableTargetLetters.indexOf(guess[j])] = ' '
+                if (availableTargetLettersForGrid.contains(guess[j])) {
+                    tileColors[j] = Color.parseColor("#C9B458") // Yellow
+                    availableTargetLettersForGrid.indexOf(guess[j]).let { availableTargetLettersForGrid[it] = ' ' }
                 }
             }
         }
@@ -100,8 +114,31 @@ class Daily1 : AppCompatActivity() {
             tiles[currentRow][j]?.apply { setBackgroundColor(tileColors[j]); setTextColor(Color.WHITE) }
         }
 
+        // --- Keyboard Coloring Logic ---
+        for (j in 0 until cols) {
+            val letter = guess[j]
+            if (letter == targetWord[j]) {
+                keyboardLetterStatus[letter] = LetterStatus.CORRECT
+            } else if (targetWord.contains(letter)) {
+                // Only mark as PRESENT if not already CORRECT
+                if (keyboardLetterStatus[letter] != LetterStatus.CORRECT) {
+                    keyboardLetterStatus[letter] = LetterStatus.PRESENT
+                }
+            } else {
+                // Only mark as ABSENT if we don't know its status yet
+                if (!keyboardLetterStatus.containsKey(letter)) {
+                    keyboardLetterStatus[letter] = LetterStatus.ABSENT
+                }
+            }
+        }
+        updateKeyboardAppearance()
+
+        // --- Win/Loss Check ---
         if (guess.equals(targetWord, ignoreCase = true)) {
-            showStatsPanel(didWin = true)
+            // Delay showing stats panel to let user see winning colors
+            Handler(Looper.getMainLooper()).postDelayed({
+                showStatsPanel(didWin = true)
+            }, 1000)
             return
         }
 
@@ -109,7 +146,25 @@ class Daily1 : AppCompatActivity() {
         currentCol = 0
 
         if (currentRow >= rows) {
-            showStatsPanel(didWin = false)
+            // Delay showing stats panel to let user see final guess colors
+            Handler(Looper.getMainLooper()).postDelayed({
+                showStatsPanel(didWin = false)
+            }, 1000)
+        }
+    }
+
+    // --- New Keyboard Helper Function ---
+    private fun updateKeyboardAppearance() {
+        for ((char, button) in letterButtonMap) {
+            val status = keyboardLetterStatus[char] ?: continue
+            val color = when (status) {
+                LetterStatus.CORRECT -> Color.parseColor("#6AAA64")
+                LetterStatus.PRESENT -> Color.parseColor("#C9B458")
+                LetterStatus.ABSENT -> Color.parseColor("#787C7E")
+            }
+            val drawable = button.background
+            DrawableCompat.setTint(drawable, color)
+            button.setTextColor(Color.WHITE)
         }
     }
 
@@ -130,7 +185,6 @@ class Daily1 : AppCompatActivity() {
     private fun fetchWordleWord() {
         RetrofitClient.instance.getRandomWord().enqueue(object : Callback<WordResponse> {
             override fun onResponse(call: Call<WordResponse>, response: Response<WordResponse>) {
-
                 binding.keyboardLayout.visibility = View.VISIBLE
                 if (response.isSuccessful) {
                     targetWord = response.body()?.word?.uppercase() ?: "APPLE"
@@ -140,27 +194,27 @@ class Daily1 : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<WordResponse>, t: Throwable) {
-
                 binding.keyboardLayout.visibility = View.VISIBLE
-                targetWord = "LOCAL"
+                targetWord = "LOCAL" // Fallback for network failure
                 Toast.makeText(this@Daily1, "Network Error. Using default word.", Toast.LENGTH_LONG).show()
             }
         })
     }
 
+    // --- Updated setupKeyboard() ---
     private fun setupKeyboard() {
-        val buttonMap = mapOf(
-            binding.buttonQ to 'Q', binding.buttonW to 'W', binding.buttonE to 'E',
-            binding.buttonR to 'R', binding.buttonT to 'T', binding.buttonY to 'Y',
-            binding.buttonU to 'U', binding.buttonI to 'I', binding.buttonO to 'O',
-            binding.buttonP to 'P', binding.buttonA to 'A', binding.buttonS to 'S',
-            binding.buttonD to 'D', binding.buttonF to 'F', binding.buttonG to 'G',
-            binding.buttonH to 'H', binding.buttonJ to 'J', binding.buttonK to 'K',
-            binding.buttonL to 'L', binding.buttonZ to 'Z', binding.buttonX to 'X',
-            binding.buttonC to 'C', binding.buttonV to 'V', binding.buttonB to 'B',
-            binding.buttonN to 'N', binding.buttonM to 'M'
+        letterButtonMap = mapOf(
+            'Q' to binding.buttonQ, 'W' to binding.buttonW, 'E' to binding.buttonE,
+            'R' to binding.buttonR, 'T' to binding.buttonT, 'Y' to binding.buttonY,
+            'U' to binding.buttonU, 'I' to binding.buttonI, 'O' to binding.buttonO,
+            'P' to binding.buttonP, 'A' to binding.buttonA, 'S' to binding.buttonS,
+            'D' to binding.buttonD, 'F' to binding.buttonF, 'G' to binding.buttonG,
+            'H' to binding.buttonH, 'J' to binding.buttonJ, 'K' to binding.buttonK,
+            'L' to binding.buttonL, 'Z' to binding.buttonZ, 'X' to binding.buttonX,
+            'C' to binding.buttonC, 'V' to binding.buttonV, 'B' to binding.buttonB,
+            'N' to binding.buttonN, 'M' to binding.buttonM
         )
-        for ((button, letter) in buttonMap) { button.setOnClickListener { onLetterPressed(letter) } }
+        for ((letter, button) in letterButtonMap) { button.setOnClickListener { onLetterPressed(letter) } }
         binding.buttonEnter.setOnClickListener { onEnterPressed() }
         binding.buttonDelete.setOnClickListener { onBackPressedCustom() }
     }

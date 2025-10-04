@@ -6,20 +6,21 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import android.os.Handler
 import android.os.Looper
-import com.st10036346.wordventure2.databinding.ActivityLocalMatchBinding // IMPORTANT: Use ActivityLocalMatchBinding
+import androidx.core.graphics.drawable.DrawableCompat
+import com.st10036346.wordventure2.databinding.ActivityLocalMatchBinding
 
 // Data class to hold the state of a single tile (its text and color)
 data class TileState(val text: String, val backgroundColor: Int, val textColor: Int)
 
 class LocalMatch : AppCompatActivity() {
 
-    // Use the binding class for activity_local_match.xml
     private lateinit var binding: ActivityLocalMatchBinding
 
     // --- Game Board State ---
@@ -35,6 +36,12 @@ class LocalMatch : AppCompatActivity() {
     private var player2TargetWord = "" // Word Player 2 needs to guess (chosen by P1)
     private var targetWord = "" // The word for the *active* player to guess
 
+    // --- NEW: Keyboard State Management ---
+    private enum class LetterStatus { CORRECT, PRESENT, ABSENT }
+    private val keyboardLetterStatus = mutableMapOf<Char, LetterStatus>()
+    private lateinit var letterButtonMap: Map<Char, Button>
+    // ------------------------------------
+
     // --- Board states for each player ---
     private var player1BoardState = Array(rows) { Array(cols) { TileState("", 0, 0) } }
     private var player2BoardState = Array(rows) { Array(cols) { TileState("", 0, 0) } }
@@ -43,12 +50,11 @@ class LocalMatch : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Inflate the correct layout
         binding = ActivityLocalMatchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupBoard()
-        setupKeyboard()
+        setupKeyboard() // This now initializes letterButtonMap
 
         // --- Multiplayer Mode Setup ---
         player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
@@ -75,7 +81,7 @@ class LocalMatch : AppCompatActivity() {
                     setTypeface(null, Typeface.BOLD)
                     background = defaultTileBg
                 }
-                binding.boardGrid.addView(tile) // Assumes boardGrid ID exists in activity_local_match.xml
+                binding.boardGrid.addView(tile)
                 tiles[i][j] = tile
             }
         }
@@ -95,6 +101,7 @@ class LocalMatch : AppCompatActivity() {
         }
     }
 
+    // --- THIS IS THE UPDATED FUNCTION ---
     private fun onEnterPressed() {
         if (currentCol != cols) {
             Toast.makeText(this, "Not enough letters", Toast.LENGTH_SHORT).show()
@@ -103,19 +110,20 @@ class LocalMatch : AppCompatActivity() {
 
         val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }
 
-        // Color logic
-        val availableTargetLetters = targetWord.toMutableList()
+        // --- Grid Color Logic (from your original code) ---
+        val availableTargetLettersForGrid = targetWord.toMutableList()
         val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Gray
         for (j in 0 until cols) {
             if (guess[j] == targetWord[j]) {
-                tileColors[j] = Color.parseColor("#6AAA64"); availableTargetLetters[j] = ' '
+                tileColors[j] = Color.parseColor("#6AAA64") // Green
+                availableTargetLettersForGrid[j] = ' '
             }
         }
         for (j in 0 until cols) {
             if (tileColors[j] != Color.parseColor("#6AAA64")) {
-                if (availableTargetLetters.contains(guess[j])) {
-                    tileColors[j] = Color.parseColor("#C9B458")
-                    availableTargetLetters[availableTargetLetters.indexOf(guess[j])] = ' '
+                if (availableTargetLettersForGrid.contains(guess[j])) {
+                    tileColors[j] = Color.parseColor("#C9B458") // Yellow
+                    availableTargetLettersForGrid[availableTargetLettersForGrid.indexOf(guess[j])] = ' '
                 }
             }
         }
@@ -123,15 +131,46 @@ class LocalMatch : AppCompatActivity() {
             tiles[currentRow][j]?.apply { setBackgroundColor(tileColors[j]); setTextColor(Color.WHITE) }
         }
 
+        // --- NEW: Keyboard Coloring Logic ---
+        for (j in 0 until cols) {
+            val letter = guess[j]
+            // First pass for CORRECT (Green) letters to give them priority
+            if (letter == targetWord[j]) {
+                keyboardLetterStatus[letter] = LetterStatus.CORRECT
+            }
+            // Second pass for PRESENT (Yellow) and ABSENT (Gray) letters
+            else {
+                val isPresent = targetWord.contains(letter)
+                // Only update if it's not already marked as CORRECT
+                if (keyboardLetterStatus[letter] != LetterStatus.CORRECT) {
+                    if (isPresent) {
+                        // Don't downgrade from PRESENT to ABSENT
+                        if (keyboardLetterStatus[letter] != LetterStatus.PRESENT) {
+                            keyboardLetterStatus[letter] = LetterStatus.PRESENT
+                        }
+                    } else {
+                        // Only mark as ABSENT if we haven't found it to be PRESENT or CORRECT before
+                        if (!keyboardLetterStatus.containsKey(letter)) {
+                            keyboardLetterStatus[letter] = LetterStatus.ABSENT
+                        }
+                    }
+                }
+            }
+        }
+        updateKeyboardAppearance() // Apply the new colors
+
+        // --- Win condition check ---
         if (guess.equals(targetWord, ignoreCase = true)) {
-            showEndGamePanel(didWin = true)
+            // Use a short delay so the player can see the winning colors
+            Handler(Looper.getMainLooper()).postDelayed({
+                showEndGamePanel(didWin = true)
+            }, 1000)
             return
         }
 
+        // --- Turn switching logic (from your original code) ---
         binding.keyboardLayout.isEnabled = false
-
         Handler(Looper.getMainLooper()).postDelayed({
-            // This code will run after a 2-second delay
             currentRow++
             currentCol = 0
 
@@ -139,16 +178,31 @@ class LocalMatch : AppCompatActivity() {
                 if ((activePlayer == 1 && player2CurrentRow >= rows) || (activePlayer == 2 && player1CurrentRow >= rows)) {
                     showEndGamePanel(didWin = false) // Both players lost (draw)
                 } else {
-                    switchPlayer() // Switch turns
+                    switchPlayer()
                 }
             } else {
-                switchPlayer() // Switch turns
+                switchPlayer()
+            }
+            binding.keyboardLayout.isEnabled = true
+        }, 2000)
+    }
+
+    // --- NEW HELPER FUNCTION ---
+    private fun updateKeyboardAppearance() {
+        for ((char, button) in letterButtonMap) {
+            val status = keyboardLetterStatus[char] ?: continue // Get status for this character
+
+            val color = when (status) {
+                LetterStatus.CORRECT -> Color.parseColor("#6AAA64") // Green
+                LetterStatus.PRESENT -> Color.parseColor("#C9B458") // Yellow
+                LetterStatus.ABSENT -> Color.parseColor("#787C7E")   // Gray
             }
 
-            // Re-enable the keyboard for the next player
-            binding.keyboardLayout.isEnabled = true
-
-        }, 2000)
+            // Use DrawableCompat to safely change the background tint of the key
+            val drawable = button.background
+            DrawableCompat.setTint(drawable, color)
+            button.setTextColor(Color.WHITE) // Change text to white for better contrast
+        }
     }
 
     private fun switchPlayer() {
@@ -208,19 +262,16 @@ class LocalMatch : AppCompatActivity() {
     }
 
     private fun updatePlayerIndicator() {
-        // Assumes player1_turn_indicator and player2_turn_indicator IDs exist in the layout
         if (activePlayer == 1) {
             binding.screenTitle.text = "PLAYER 1'S TURN"
-            Toast.makeText(this, "Player 1's Turn!", Toast.LENGTH_SHORT).show()
         } else {
             binding.screenTitle.text = "PLAYER 2'S TURN"
-            Toast.makeText(this, "Player 2's Turn!", Toast.LENGTH_SHORT).show()
         }
+        // Removed toast messages as they are redundant with the title change
     }
 
     private fun showEndGamePanel(didWin: Boolean) {
         binding.keyboardLayout.visibility = View.GONE
-        // Assumes statsPanel.statsTitle ID exists via an <include> in the layout
         val statsTitle = binding.statsPanel.statsTitle
 
         if (didWin) {
@@ -236,19 +287,22 @@ class LocalMatch : AppCompatActivity() {
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
     }
 
+    // --- UPDATED setupKeyboard() ---
     private fun setupKeyboard() {
-        val buttonMap = mapOf(
-            binding.buttonQ to 'Q', binding.buttonW to 'W', binding.buttonE to 'E',
-            binding.buttonR to 'R', binding.buttonT to 'T', binding.buttonY to 'Y',
-            binding.buttonU to 'U', binding.buttonI to 'I', binding.buttonO to 'O',
-            binding.buttonP to 'P', binding.buttonA to 'A', binding.buttonS to 'S',
-            binding.buttonD to 'D', binding.buttonF to 'F', binding.buttonG to 'G',
-            binding.buttonH to 'H', binding.buttonJ to 'J', binding.buttonK to 'K',
-            binding.buttonL to 'L', binding.buttonZ to 'Z', binding.buttonX to 'X',
-            binding.buttonC to 'C', binding.buttonV to 'V', binding.buttonB to 'B',
-            binding.buttonN to 'N', binding.buttonM to 'M'
+        // This links the character to the button view.
+        // Make sure your button IDs in XML match this (e.g., binding.buttonQ)
+        letterButtonMap = mapOf(
+            'Q' to binding.buttonQ, 'W' to binding.buttonW, 'E' to binding.buttonE,
+            'R' to binding.buttonR, 'T' to binding.buttonT, 'Y' to binding.buttonY,
+            'U' to binding.buttonU, 'I' to binding.buttonI, 'O' to binding.buttonO,
+            'P' to binding.buttonP, 'A' to binding.buttonA, 'S' to binding.buttonS,
+            'D' to binding.buttonD, 'F' to binding.buttonF, 'G' to binding.buttonG,
+            'H' to binding.buttonH, 'J' to binding.buttonJ, 'K' to binding.buttonK,
+            'L' to binding.buttonL, 'Z' to binding.buttonZ, 'X' to binding.buttonX,
+            'C' to binding.buttonC, 'V' to binding.buttonV, 'B' to binding.buttonB,
+            'N' to binding.buttonN, 'M' to binding.buttonM
         )
-        for ((button, letter) in buttonMap) { button.setOnClickListener { onLetterPressed(letter) } }
+        for ((letter, button) in letterButtonMap) { button.setOnClickListener { onLetterPressed(letter) } }
         binding.buttonEnter.setOnClickListener { onEnterPressed() }
         binding.buttonDelete.setOnClickListener { onBackPressedCustom() }
     }
