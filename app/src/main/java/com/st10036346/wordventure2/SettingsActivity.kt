@@ -90,9 +90,15 @@ class SettingsActivity : AppCompatActivity() {
             Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
         }
 
-        // Sound Switch Listener
+        // 🟢 Sound Switch Listener: ADD CALL TO MUSIC SERVICE HERE
         binding.soundSwitch.setOnCheckedChangeListener { _, isChecked ->
+            // 1. Save the new preference
             prefs.edit().putBoolean(KEY_SOUND, isChecked).apply()
+
+            // 2. Call the static function in the BackgroundMusicService to control volume
+            // isChecked = true (Sound ON) -> Muted is false
+            // isChecked = false (Sound OFF) -> Muted is true
+            BackgroundMusicService.setVolume(!isChecked)
 
             val toastMessage = if (isChecked) "Sound On" else "Sound Off (Muted)"
             Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
