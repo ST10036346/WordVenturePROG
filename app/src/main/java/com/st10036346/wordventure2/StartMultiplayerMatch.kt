@@ -48,6 +48,26 @@ class StartMultiplayerMatch : AppCompatActivity() {
         // -----------------------------------------------
 
         binding.loadingIndicator.visibility = View.VISIBLE
+
+        binding.profileIcon.setOnClickListener {
+            // Create an Intent to start ProfileActivity
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 2. Settings Icon Click Listener
+        binding.settingsIcon.setOnClickListener {
+            // Create an Intent to start SettingsActivity
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
+        // You can also add one for the book icon to go home if you wish
+        binding.bookIcon.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish() // Optional: finish Daily1 so the user can't go back to it
+        }
         fetchWords()
     }
 
