@@ -16,12 +16,12 @@ import android.graphics.Typeface
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.st10036346.wordventure2.ProfilePhotoActivity.Companion.getProfilePicResId
 
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileBinding
     private lateinit var auth: FirebaseAuth
-    // ADDED: StatsManager instance
     private lateinit var statsManager: StatsManager
 
     companion object {
@@ -45,17 +45,41 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ADDED: Initialize StatsManager
+        // Initialize StatsManager
         statsManager = StatsManager(this)
 
         // populate UI with user data
         displayUserProfile()
 
-        // ADDED: Display game statistics
+        // ADDED: Load the selected profile picture from SharedPreferences
+        loadProfilePicture()
+
+        // Display game statistics
         displayGameStats()
 
         // set up listeners for navigation and actions
         setListeners()
+    }
+
+    /**
+     * Ensures the profile picture is reloaded every time the user navigates back to this activity.
+     */
+    override fun onResume() {
+        super.onResume()
+        loadProfilePicture()
+    }
+
+    /**
+     * Loads the saved profile picture resource ID from SharedPreferences
+     * and displays it in the profilePicture ImageView.
+     */
+    private fun loadProfilePicture() {
+        // Get the saved resource ID using the static helper from ProfilePhotoActivity
+        // If nothing is saved, it returns the default image ID.
+        val savedResId = getProfilePicResId(this)
+
+        // Set the image resource on the ImageView
+        binding.profilePicture.setImageResource(savedResId)
     }
 
     /**
@@ -84,12 +108,10 @@ class ProfileActivity : AppCompatActivity() {
 
     /**
      * Retrieves and displays the game statistics.
-     * NOTE: You must have corresponding IDs in your activity_profile.xml (e.g., profile_games_played_value)
      */
     private fun displayGameStats() {
         val stats = statsManager.getStats()
 
-        // ASSUMPTION: You have these TextViews in activity_profile.xml to display the stats
         try {
             // Update Basic Stats
             binding.gamesPlayedValue.text = stats.gamesPlayed.toString()
@@ -99,15 +121,13 @@ class ProfileActivity : AppCompatActivity() {
             // Update Graph
             updateGuessDistributionGraph(stats.guessDistribution)
         } catch (e: Exception) {
-            Log.e(TAG, "Error binding profile stats views: Ensure activity_profile.xml contains games_played_value, win_streak_value, max_streak_value, and guess_distribution_chart_container.", e)
+            Log.e(TAG, "Error binding profile stats views: Ensure activity_profile.xml contains required TextViews.", e)
             // Show a user-friendly error or skip updating these views
         }
     }
 
     // NEW FUNCTION: Handles the bar graph drawing for the Profile Screen
-    // This is a duplicate of the logic in Daily1.kt for convenience.
     private fun updateGuessDistributionGraph(guessDist: IntArray) {
-        // ASSUMPTION: You have a LinearLayout with this ID in your activity_profile.xml
         val chartContainer = binding.guessDistributionChartContainer
 
         // Calculate the maximum count to determine bar scale
@@ -193,11 +213,9 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     /**
-     * Sets up click listeners for the nav bar.
+     * Sets up click listeners for the nav bar and profile actions.
      */
     private fun setListeners() {
-        // nav bar
-
         // Back Icon navigates to the previous screen (typically Main Menu)
         binding.backIcon.setOnClickListener {
             finish() // Standard back behavior
@@ -211,6 +229,12 @@ class ProfileActivity : AppCompatActivity() {
         // Logout button logs user out
         binding.logoutButton.setOnClickListener {
             showLogoutConfirmationDialog()
+        }
+
+        // --- PROFILE PHOTO NAVIGATION (NEW) ---
+        // Click on the profile photo card to navigate to the selection activity
+        binding.profilePhotoCard.setOnClickListener {
+            startActivity(Intent(this, ProfilePhotoActivity::class.java))
         }
 
         // --- Username Save Listener ---
@@ -279,6 +303,7 @@ class ProfileActivity : AppCompatActivity() {
      * Helper function to clear the activity stack and redirect to the Login screen.
      */
     private fun redirectToLogin() {
+        // Assuming 'Login' is the name of your login activity class
         val intent = Intent(this, Login::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }

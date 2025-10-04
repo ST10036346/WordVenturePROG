@@ -126,6 +126,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
+                <!-- This is the ImageView that will display the selected profile picture -->
                 <ImageView
                     android:id="@+id/profilePicture"
                     android:layout_width="100dp"

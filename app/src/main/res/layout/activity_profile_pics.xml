@@ -125,7 +125,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/profilePicture"
+                    android:id="@+id/selectedProfilePicture"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_gravity="center"
