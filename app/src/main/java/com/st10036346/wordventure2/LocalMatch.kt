@@ -41,6 +41,9 @@ class LocalMatch : AppCompatActivity() {
     private enum class LetterStatus { CORRECT, PRESENT, ABSENT }
     private val keyboardLetterStatus = mutableMapOf<Char, LetterStatus>()
     private lateinit var letterButtonMap: Map<Char, Button>
+
+    private var player1Name = "Player 1"
+    private var player2Name = "Player 2"
     // ------------------------------------
 
     // --- Board states for each player ---
@@ -57,6 +60,12 @@ class LocalMatch : AppCompatActivity() {
         setupBoard()
         setupKeyboard() // This now initializes letterButtonMap
 
+        player1Name = intent.getStringExtra("PLAYER_1_NAME") ?: "Player 1"
+        player2Name = intent.getStringExtra("PLAYER_2_NAME") ?: "Player 2"
+        player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
+        player2TargetWord = intent.getStringExtra("PLAYER_2_TARGET_WORD")?.uppercase() ?: "ERROR"
+
+
         // --- Multiplayer Mode Setup ---
         player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
         player2TargetWord = intent.getStringExtra("PLAYER_2_TARGET_WORD")?.uppercase() ?: "ERROR"
@@ -67,6 +76,10 @@ class LocalMatch : AppCompatActivity() {
         updatePlayerIndicator()
 
         binding.keyboardLayout.visibility = View.VISIBLE
+
+
+
+
 
         binding.profileIcon.setOnClickListener {
             // Create an Intent to start ProfileActivity
@@ -284,9 +297,9 @@ class LocalMatch : AppCompatActivity() {
 
     private fun updatePlayerIndicator() {
         if (activePlayer == 1) {
-            binding.screenTitle.text = "PLAYER 1'S TURN"
+            binding.screenTitle.text = "$player1Name 'S TURN"
         } else {
-            binding.screenTitle.text = "PLAYER 2'S TURN"
+            binding.screenTitle.text = "$player2Name 'S TURN"
         }
         // Removed toast messages as they are redundant with the title change
     }

@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WordVenture2">
         <activity
+            android:name=".EnterPlayerNamesActivity"
+            android:exported="false" />
+        <activity
             android:name=".LocalMatch"
             android:exported="false" />
         <activity
@@ -47,22 +50,17 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="true" />
-
         <activity
             android:name=".ProfileActivity"
             android:exported="true" />
-
         <activity
             android:name=".LanguageActivity"
             android:exported="true" />
-
         <activity
             android:name=".ProfilePhotoActivity"
             android:exported="true" />
 
         <service android:name=".BackgroundMusicService" />
-
     </application>
-
 
 </manifest>

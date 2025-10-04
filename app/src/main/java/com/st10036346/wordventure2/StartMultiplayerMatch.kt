@@ -25,6 +25,9 @@ class StartMultiplayerMatch : AppCompatActivity() {
     private var currentPlayer = 1
     private var player1Word: String? = null
 
+    private var player1Name = "Player 1"
+    private var player2Name = "Player 2"
+
     companion object {
         const val EXTRA_CURRENT_PLAYER = "EXTRA_CURRENT_PLAYER"
         const val EXTRA_PLAYER_1_WORD = "EXTRA_PLAYER_1_WORD"
@@ -35,6 +38,11 @@ class StartMultiplayerMatch : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityStartMultiplayerMatchBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        player1Name = intent.getStringExtra("PLAYER_1_NAME") ?: "Player 1"
+        player2Name = intent.getStringExtra("PLAYER_2_NAME") ?: "Player 2"
+        updateTurnIndicator()
+
 
         // --- NEW: Check intent for current player state ---
         currentPlayer = intent.getIntExtra(EXTRA_CURRENT_PLAYER, 1) // Default to Player 1
@@ -71,6 +79,13 @@ class StartMultiplayerMatch : AppCompatActivity() {
         fetchWords()
     }
 
+    private fun updateTurnIndicator() {
+        // You can expand this logic if needed. For this screen,
+        // you might just want to show the starting player.
+        // For now, let's just show who is up first.
+        val turnText = "$player1Name's Turn"
+        binding.playerTurnIndicator.text = turnText
+    }
     private fun fetchWords() {
         val wordsToFetch = 4
         val fetchedWords = Collections.synchronizedList(mutableListOf<String>())

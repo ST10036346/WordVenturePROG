@@ -39,11 +39,10 @@ class Muliplayer : AppCompatActivity() {
             finish() // Optional: finish Daily1 so the user can't go back to it
         }
 
-        val localGameButton = findViewById<Button>(R.id.localMatchButton) // Or use View Binding
 
-        localGameButton.setOnClickListener {
-            val intent = Intent(this, StartMultiplayerMatch::class.java)
-            startActivity(intent)
+        binding.localMatchButton.setOnClickListener {// This now goes to the new name entry screen
+            startActivity(Intent(this, EnterPlayerNamesActivity::class.java))
         }
+
     }
 }

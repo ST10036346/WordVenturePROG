@@ -66,7 +66,7 @@ class Daily1 : AppCompatActivity() {
         }
 
         // You can also add one for the book icon to go home if you wish
-        binding.bookIcon.setOnClickListener {
+        binding.backIcon.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish() // Optional: finish Daily1 so the user can't go back to it
