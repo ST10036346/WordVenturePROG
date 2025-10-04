@@ -52,6 +52,10 @@
             android:name=".ProfileActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".LanguageActivity"
+            android:exported="true" />
+
         <service android:name=".BackgroundMusicService" />
 
     </application>
