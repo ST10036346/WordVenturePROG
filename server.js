@@ -21,7 +21,7 @@ app.post("/check-word", (req, res) => {
     return res.status(400).json({ valid: false, message: "No word provided" });
   }
 
-  const isValid = words.includes(guess.toLowerCase() || words.includes(guess.toUpperCase()));
+  const isValid = words.includes(guess.toLowerCase() );
   res.json({ valid: isValid });
 });
 app.listen(PORT, () => {
