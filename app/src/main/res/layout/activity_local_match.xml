@@ -183,7 +183,7 @@
 
     <include
         android:id="@+id/stats_panel"
-        layout="@layout/stats_panel" />
+        layout="@layout/local_stats_panel" />
 
 </FrameLayout>
 

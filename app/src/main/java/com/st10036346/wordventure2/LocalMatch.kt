@@ -16,6 +16,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.graphics.drawable.DrawableCompat
 import com.st10036346.wordventure2.databinding.ActivityLocalMatchBinding
+import kotlin.jvm.java
 
 // Data class to hold the state of a single tile (its text and color)
 data class TileState(val text: String, val backgroundColor: Int, val textColor: Int)
@@ -51,6 +52,9 @@ class LocalMatch : AppCompatActivity() {
     private var player2BoardState = Array(rows) { Array(cols) { TileState("", 0, 0) } }
     private var player1CurrentRow = 0
     private var player2CurrentRow = 0
+
+    private var player1Wins = 0
+    private var player2Wins = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -304,22 +308,54 @@ class LocalMatch : AppCompatActivity() {
         // Removed toast messages as they are redundant with the title change
     }
 
+    // In LocalMatch.kt
+
     private fun showEndGamePanel(didWin: Boolean) {
         binding.keyboardLayout.visibility = View.GONE
         val statsTitle = binding.statsPanel.statsTitle
+        val statsBody = binding.statsPanel.statsBody // Assuming you have a TextView with this ID
 
         if (didWin) {
-            statsTitle.text = "Player $activePlayer Wins!"
-            val otherPlayer = if (activePlayer == 1) 2 else 1
-            val wordToReveal = if (activePlayer == 1) player2TargetWord else player1TargetWord
-            Toast.makeText(this, "Player $otherPlayer's word was: $wordToReveal", Toast.LENGTH_LONG).show()
+            if (activePlayer == 1) {
+                player1Wins++
+                statsTitle.text = "$player1Name Wins!"
+            } else {
+                player2Wins++
+                statsTitle.text = "$player2Name Wins!"
+            }
         } else {
             statsTitle.text = "It's a Draw!"
-            Toast.makeText(this, "P1 Word: $player2TargetWord | P2 Word: $player1TargetWord", Toast.LENGTH_LONG).show()
         }
+
+        // --- NEW: Display the overall score ---
+        statsBody.text = "SCORE\n$player1Name: $player1Wins\n$player2Name: $player2Wins"
+        statsBody.visibility = View.VISIBLE // Make sure the body is visible
+
         binding.statsPanelContainer.visibility = View.VISIBLE
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
+
+        // --- NEW: Setup "Play Again" and "Main Menu" buttons ---
+        val playAgainButton = binding.statsPanel.playAgainButton
+        val mainMenuButton = binding.statsPanel.mainMenuButton
+
+        playAgainButton.visibility = View.VISIBLE
+        mainMenuButton.visibility = View.VISIBLE
+
+        playAgainButton.setOnClickListener {
+            // Restart the activity with the same players and words but updated scores
+            val intent = Intent(this, StartMultiplayerMatch::class.java)
+            // You would typically restart the lobby to enter new words
+            startActivity(intent)
+            finish()
+        }
+
+        mainMenuButton.setOnClickListener {
+            val intent = Intent(this, MainMenu::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
+
 
     // --- UPDATED setupKeyboard() ---
     private fun setupKeyboard() {
