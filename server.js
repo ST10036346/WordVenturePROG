@@ -12,7 +12,16 @@ app.get("/random-word", (req, res) => {
   const randomWord = words[Math.floor(Math.random() * words.length)];
   res.json({ word: randomWord });
 });
+app.post("/check-word", (req, res) => {
+  const { guess } = req.body;
 
+  if (!guess) {
+    return res.status(400).json({ valid: false, message: "No word provided" });
+  }
+
+  const isValid = words.includes(guess.toLowerCase());
+  res.json({ valid: isValid });
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
