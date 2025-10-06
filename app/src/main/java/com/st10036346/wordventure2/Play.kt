@@ -12,27 +12,31 @@ import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout // ADDED: Required for dynamic chart drawing
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import com.st10036346.wordventure2.databinding.ActivityDaily1Binding
+
+// 💡 CRITICAL FIX 1: Import the correct binding class for 'play_screen.xml'
+// The correct binding name is derived from your XML filename: play_screen -> PlayScreenBinding
+import com.st10036346.wordventure2.databinding.PlayScreenBinding // <--- NEW CORRECT BINDING IMPORT
+// import com.st10036346.wordventure2.databinding.ActivityDaily1Binding // <-- OLD, INCORRECT BINDING IMPORT (REMOVED)
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.jvm.java
 
-// ADDED IMPORTS for Stats Management:
 import com.st10036346.wordventure2.StatsManager
 
-class Daily1 : AppCompatActivity() {
+class Play : AppCompatActivity() {
 
-    private lateinit var binding: ActivityDaily1Binding
+    // 💡 CRITICAL FIX 2: Change the binding type to the correct class
+    private lateinit var binding: PlayScreenBinding // <--- NEW CORRECT BINDING TYPE
 
     private val rows = 6
     private val cols = 5
@@ -40,6 +44,12 @@ class Daily1 : AppCompatActivity() {
     private var currentRow = 0
     private var currentCol = 0
     private var targetWord = ""
+
+    // --- LEVEL TRACKING ---
+    private var currentLevelNumber: Int = 1
+    private val PREFS_NAME = "GameProgress"
+    private val KEY_UNLOCKED_LEVEL = "current_level_unlocked"
+    // ----------------------
 
     private lateinit var statsManager: StatsManager
 
@@ -54,41 +64,56 @@ class Daily1 : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityDaily1Binding.inflate(layoutInflater)
+
+        // 💡 CRITICAL FIX 3: Inflate the correct layout binding
+        binding = PlayScreenBinding.inflate(layoutInflater) // <--- NEW CORRECT BINDING INFLATION
         setContentView(binding.root)
 
         statsManager = StatsManager(this)
 
-        isReplayMode = intent.getBooleanExtra("IS_REPLAY", false)
+        // Get the level number passed from the Levels screen
+        currentLevelNumber = intent.getIntExtra("LEVEL_NUMBER", 1)
+        Toast.makeText(this, "Level $currentLevelNumber Loaded", Toast.LENGTH_SHORT).show()
 
-        if (isReplayMode) {
-            loadAndReplayGame()
-        } else {
-            setupBoard()
-            setupKeyboard()
-            binding.keyboardLayout.visibility = View.INVISIBLE
-            fetchWordleWord()
-        }
 
-        binding.profileIcon.setOnClickListener {
+        // --- Always start a fresh game for Levels mode ---
+        setupBoard()
+        setupKeyboard()
+        binding.keyboardLayout.visibility = View.INVISIBLE // Assuming this ID exists in play_screen.xml
+        fetchWordleWord()
+        // -------------------------------------------------
+
+        binding.profileIcon.setOnClickListener { // Assuming this ID exists in play_screen.xml
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
 
-        binding.settingsIcon.setOnClickListener {
+        binding.settingsIcon.setOnClickListener { // Assuming this ID exists in play_screen.xml
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        binding.backIcon.setOnClickListener {
-            val intent = Intent(this, MainMenu::class.java)
+        // Back icon goes back to the Levels screen for this mode
+        binding.backIcon.setOnClickListener { // Assuming this ID exists in play_screen.xml
+            val intent = Intent(this, Levels::class.java)
             startActivity(intent)
             finish()
         }
     }
 
+    private fun saveLevelProgress(levelCompleted: Int) {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val nextLevel = levelCompleted + 1
+
+        // Only save if the completed level is the one that unlocks the next one
+        if (nextLevel > prefs.getInt(KEY_UNLOCKED_LEVEL, 1)) {
+            prefs.edit().putInt(KEY_UNLOCKED_LEVEL, nextLevel).apply()
+            Toast.makeText(this, "Level $levelCompleted complete! Level $nextLevel unlocked.", Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun setupBoard() {
-        binding.boardGrid.removeAllViews()
+        binding.boardGrid.removeAllViews() // Assuming this ID exists in play_screen.xml
         val defaultTileBg = ContextCompat.getDrawable(this, R.drawable.tile_border)
         for (i in 0 until rows) {
             for (j in 0 until cols) {
@@ -110,14 +135,14 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun onLetterPressed(letter: Char) {
-        if (currentCol < cols && binding.keyboardLayout.isEnabled) {
+        if (currentCol < cols && binding.keyboardLayout.isEnabled) { // Assuming this ID exists in play_screen.xml
             tiles[currentRow][currentCol]?.text = letter.toString()
             currentCol++
         }
     }
 
     private fun onBackPressedCustom() {
-        if (currentCol > 0 && binding.keyboardLayout.isEnabled) {
+        if (currentCol > 0 && binding.keyboardLayout.isEnabled) { // Assuming this ID exists in play_screen.xml
             currentCol--
             tiles[currentRow][currentCol]?.text = ""
         }
@@ -133,7 +158,7 @@ class Daily1 : AppCompatActivity() {
         val safeContext = this
         val guessBody = WordGuess(guess)
 
-        binding.keyboardLayout.isEnabled = false
+        binding.keyboardLayout.isEnabled = false // Assuming this ID exists in play_screen.xml
 
         RetrofitClient.instance.checkWord(guessBody).enqueue(object : Callback<CheckWordResponse> {
             override fun onResponse(call: Call<CheckWordResponse>, response: Response<CheckWordResponse>) {
@@ -144,7 +169,7 @@ class Daily1 : AppCompatActivity() {
                 } else {
                     Handler(Looper.getMainLooper()).postDelayed({
                         Toast.makeText(applicationContext, "Not in word list", Toast.LENGTH_SHORT).show()
-                        binding.keyboardLayout.isEnabled = true
+                        binding.keyboardLayout.isEnabled = true // Assuming this ID exists in play_screen.xml
                     }, 50)
                 }
             }
@@ -153,7 +178,7 @@ class Daily1 : AppCompatActivity() {
                 android.util.Log.e("API_FAILURE", "Retrofit call failed", t)
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(safeContext, "Could not verify word", Toast.LENGTH_SHORT).show()
-                    binding.keyboardLayout.isEnabled = true
+                    binding.keyboardLayout.isEnabled = true // Assuming this ID exists in play_screen.xml
                 }
             }
         })
@@ -182,9 +207,14 @@ class Daily1 : AppCompatActivity() {
 
         // 3. Check for a win
         if (guess.equals(targetWord, ignoreCase = true)) {
-            binding.keyboardLayout.isEnabled = false
+            binding.keyboardLayout.isEnabled = false // Assuming this ID exists in play_screen.xml
+
+            // --- LEVEL PROGRESS SAVE ON WIN ---
+            saveLevelProgress(currentLevelNumber)
+            // ----------------------------------
+
             Handler(Looper.getMainLooper()).postDelayed({
-                showStatsPanel(didWin = true)
+                showStatsPanel(didWin = true) // Show win panel
             }, 1000)
             return
         }
@@ -194,13 +224,13 @@ class Daily1 : AppCompatActivity() {
         currentCol = 0
 
         if (currentRow >= rows) {
-            binding.keyboardLayout.isEnabled = false
+            binding.keyboardLayout.isEnabled = false // Assuming this ID exists in play_screen.xml
             Handler(Looper.getMainLooper()).postDelayed({
-                showStatsPanel(didWin = false)
+                showStatsPanel(didWin = false) // Show loss panel
             }, 1000)
         } else {
             // Re-enable keyboard for the next turn if the game is not over
-            binding.keyboardLayout.isEnabled = true
+            binding.keyboardLayout.isEnabled = true // Assuming this ID exists in play_screen.xml
         }
     }
 
@@ -219,37 +249,57 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun showStatsPanel(didWin: Boolean) {
-        binding.keyboardLayout.visibility = View.GONE
-        val statsTitle = binding.statsPanel.statsTitle
+        binding.keyboardLayout.visibility = View.GONE // Assuming this ID exists in play_screen.xml
+        binding.statsPanel.statsTitle // Assuming statsPanel is an <include> in play_screen.xml
 
         if (didWin) {
-            statsTitle.text = "CONGRATULATIONS!"
+            binding.statsPanel.statsTitle.text = "LEVEL $currentLevelNumber COMPLETED!"
         } else {
-            statsTitle.text = "NEXT TIME!"
+            binding.statsPanel.statsTitle.text = "LEVEL FAILED! RETRY $currentLevelNumber"
             Toast.makeText(this, "The word was: $targetWord", Toast.LENGTH_LONG).show()
         }
 
-        if (!isReplayMode) {
-            // 1. SAVE the stats (guesses is the current row + 1)
-            val guesses = currentRow + 1
-            statsManager.updateStats(didWin, if (didWin) guesses else 0)
-            saveCompletedGame(didWin) // Your existing function
+        // --- CORRECTED CODE FOR HIDING STATS (Used for Levels) ---
+
+        // 1. Hide the horizontal container holding the 3 main metrics
+        binding.statsPanel.statsMetricsContainer.visibility = View.GONE
+
+        // 2. Hide the "Guess Distribution" label
+        binding.statsPanel.guessDistributionLabel.visibility = View.GONE
+
+        // 3. Hide the chart container
+        binding.statsPanel.guessDistributionChartContainer.visibility = View.GONE
+        // ---------------------------------------
+
+        // Change button text for Levels mode
+        binding.statsPanel.playMoreButton.text = if (didWin) "PLAY NEXT LEVEL" else "RETRY LEVEL"
+        // Note: Using mainMenuButton based on your XML ID
+        binding.statsPanel.mainMenuButton.text = "BACK TO LEVELS MENU"
+
+        // Button Listeners
+        binding.statsPanel.playMoreButton.setOnClickListener {
+            // If win, go to next level. If loss, retry current level.
+            val nextLevel = if (didWin) currentLevelNumber + 1 else currentLevelNumber
+            val intent = Intent(this, Play::class.java).apply {
+                putExtra("LEVEL_NUMBER", nextLevel)
+            }
+            startActivity(intent)
+            finish()
         }
 
-        // 2. FETCH the latest stats for display
-        val currentStats = statsManager.getStats()
+        binding.statsPanel.mainMenuButton.setOnClickListener {
+            val intent = Intent(this, Levels::class.java)
+            startActivity(intent)
+            finish()
+        }
 
-        // 3. DISPLAY the fetched stats in the panel
-        val stats = binding.statsPanel
-        stats.gamesPlayedValue.text = currentStats.gamesPlayed.toString()
-        stats.winStreakValue.text = currentStats.winStreak.toString()
-        stats.maxStreakValue.text = currentStats.maxStreak.toString()
+        // Stat updates
+        val guesses = currentRow + 1
+        statsManager.updateStats(didWin, if (didWin) guesses else 0)
 
-        // 4. Update the graph dynamically
-        updateStatsPanelGraph(stats.guessDistributionChartContainer, currentStats.guessDistribution)
 
-        binding.statsPanelContainer.visibility = View.VISIBLE
-        binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
+        binding.statsPanelContainer.visibility = View.VISIBLE // Assuming this ID exists in play_screen.xml
+        binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start() // Assuming this ID exists in play_screen.xml
     }
 
     private fun fetchWordleWord() {
@@ -257,22 +307,23 @@ class Daily1 : AppCompatActivity() {
             override fun onResponse(call: Call<WordResponse>, response: Response<WordResponse>) {
                 if (response.isSuccessful) {
                     targetWord = response.body()?.word?.uppercase() ?: "APPLE"
-                    binding.keyboardLayout.visibility = View.VISIBLE
+                    binding.keyboardLayout.visibility = View.VISIBLE // Assuming this ID exists in play_screen.xml
                 } else {
                     targetWord = "ERROR"
-                    Toast.makeText(this@Daily1, "Failed to get a word.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@Play, "Failed to get a word.", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onFailure(call: Call<WordResponse>, t: Throwable) {
                 targetWord = "LOCAL" // Fallback for network failure
-                binding.keyboardLayout.visibility = View.VISIBLE
-                Toast.makeText(this@Daily1, "Network Error. Using default word.", Toast.LENGTH_LONG).show()
+                binding.keyboardLayout.visibility = View.VISIBLE // Assuming this ID exists in play_screen.xml
+                Toast.makeText(this@Play, "Network Error. Using default word.", Toast.LENGTH_LONG).show()
             }
         })
     }
 
     private fun setupKeyboard() {
+        // Assuming all these button IDs (buttonQ, buttonW, etc.) exist in play_screen.xml
         letterButtonMap = mapOf(
             'Q' to binding.buttonQ, 'W' to binding.buttonW, 'E' to binding.buttonE,
             'R' to binding.buttonR, 'T' to binding.buttonT, 'Y' to binding.buttonY,
@@ -287,56 +338,6 @@ class Daily1 : AppCompatActivity() {
         for ((letter, button) in letterButtonMap) { button.setOnClickListener { onLetterPressed(letter) } }
         binding.buttonEnter.setOnClickListener { onEnterPressed() }
         binding.buttonDelete.setOnClickListener { onBackPressedCustom() }
-    }
-
-    private fun saveCompletedGame(didWin: Boolean) {
-        val prefs = getSharedPreferences("DailyChallenge", Context.MODE_PRIVATE)
-        val editor = prefs.edit()
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val gridState = (0 until currentRow + 1).joinToString(";") { i ->
-            (0 until cols).joinToString(",") { j ->
-                tiles[i][j]?.text.toString()
-            }
-        }
-        editor.putString("lastPlayDate", today)
-        editor.putString("savedGridState", gridState)
-        editor.putString("savedTargetWord", targetWord)
-        editor.putBoolean("didWin", didWin)
-        editor.apply()
-    }
-
-    private fun loadAndReplayGame() {
-        val prefs = getSharedPreferences("DailyChallenge", Context.MODE_PRIVATE)
-        targetWord = prefs.getString("savedTargetWord", "") ?: ""
-        val savedGridState = prefs.getString("savedGridState", "") ?: ""
-        val didWin = prefs.getBoolean("didWin", false)
-
-        if (targetWord.isEmpty() || savedGridState.isEmpty()) {
-            setupBoard()
-            setupKeyboard()
-            fetchWordleWord()
-            return
-        }
-
-        setupBoard()
-
-        val savedRows = savedGridState.split(";")
-        savedRows.forEachIndexed { i, rowString ->
-            if (i < rows) {
-                currentRow = i
-                val letters = rowString.split(",")
-                letters.forEachIndexed { j, letter ->
-                    if (j < cols) {
-                        tiles[i][j]?.text = letter
-                    }
-                }
-                val guess = (0 until cols).joinToString("") { j -> tiles[i][j]?.text.toString() }
-                colorGridRow(guess, i)
-            }
-        }
-
-        showStatsPanel(didWin)
-        binding.keyboardLayout.visibility = View.GONE
     }
 
     private fun colorGridRow(guess: String, row: Int) {

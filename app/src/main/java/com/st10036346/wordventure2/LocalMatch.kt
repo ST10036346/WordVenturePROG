@@ -25,7 +25,6 @@ class LocalMatch : AppCompatActivity() {
 
     private lateinit var binding: ActivityLocalMatchBinding
 
-    // --- Game Board State ---
     private val rows = 6
     private val cols = 5
     private val tiles = Array(rows) { arrayOfNulls<TextView>(cols) }

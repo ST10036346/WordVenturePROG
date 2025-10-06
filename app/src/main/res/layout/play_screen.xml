@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?><androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E8E8D9"
+    tools:context=".Daily1">
+
+    <!-- Header Section -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#BEC6FB"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/backIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:src="?attr/homeAsUpIndicator"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#051646" />
+
+        <TextView
+            android:id="@+id/settingsTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Play"
+            android:textColor="#051646"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/barriecito"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/backIcon"
+            app:layout_constraintEnd_toStartOf="@id/settingsIconContainer"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp" />
+
+        <LinearLayout
+            android:id="@+id/settingsIconContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/profileIcon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@mipmap/profile_icon_foreground" />
+
+            <ImageView
+                android:id="@+id/settingsIcon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@mipmap/settings_icon_foreground" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Wordle Board -->
+    <GridLayout
+        android:id="@+id/boardGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:alignmentMode="alignMargins"
+        android:columnCount="5"
+        android:rowCount="6"
+        android:padding="8dp"
+        android:useDefaultMargins="true"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintBottom_toTopOf="@id/keyboardLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
+
+    <!-- Keyboard -->
+    <!-- Keyboard -->
+    <!-- In activity_daily1.xml -->
+    <LinearLayout
+        android:id="@+id/keyboardLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#C9BFFB"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- First row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/button_q" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="Q" />
+            <Button android:id="@+id/button_w" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="W" />
+            <Button android:id="@+id/button_e" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="E" />
+            <Button android:id="@+id/button_r" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="R" />
+            <Button android:id="@+id/button_t" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="T" />
+            <Button android:id="@+id/button_y" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="Y" />
+            <Button android:id="@+id/button_u" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="U" />
+            <Button android:id="@+id/button_i" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="I" />
+            <Button android:id="@+id/button_o" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="O" />
+            <Button android:id="@+id/button_p" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="P" />
+        </LinearLayout>
+
+        <!-- Second row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <Button android:id="@+id/button_a" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="A" />
+            <Button android:id="@+id/button_s" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="S" />
+            <Button android:id="@+id/button_d" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="D" />
+            <Button android:id="@+id/button_f" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="F" />
+            <Button android:id="@+id/button_g" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="G" />
+            <Button android:id="@+id/button_h" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="H" />
+            <Button android:id="@+id/button_j" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="J" />
+            <Button android:id="@+id/button_k" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="K" />
+            <Button android:id="@+id/button_l" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="L" />
+        </LinearLayout>
+
+        <!-- Third row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/button_delete" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1.5" android:layout_margin="2dp" android:text="DEL" />
+            <Button android:id="@+id/button_z" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="Z" />
+            <Button android:id="@+id/button_x" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="X" />
+            <Button android:id="@+id/button_c" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="C" />
+            <Button android:id="@+id/button_v" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="V" />
+            <Button android:id="@+id/button_b" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="B" />
+            <Button android:id="@+id/button_n" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="N" />
+            <Button android:id="@+id/button_m" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_margin="2dp" android:text="M" />
+            <Button android:id="@+id/button_enter" style="@style/Widget.App.Button.LetterKey" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1.5" android:layout_margin="2dp" android:text="ENTER" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+    <FrameLayout
+        android:id="@+id/stats_panel_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:translationY="800dp"
+        android:visibility="invisible">
+
+        <include
+            android:id="@+id/stats_panel"
+            layout="@layout/stats_panel" />
+
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

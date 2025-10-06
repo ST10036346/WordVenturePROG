@@ -14,6 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WordVenture2">
+
         <activity
             android:name=".EnterPlayerNamesActivity"
             android:exported="false" />
@@ -59,6 +60,14 @@
         <activity
             android:name=".ProfilePhotoActivity"
             android:exported="true" />
+
+        <activity
+            android:name=".Levels"
+            android:exported="false" />
+
+        <activity
+            android:name=".Play"
+            android:exported="false" />
 
         <service android:name=".BackgroundMusicService" />
     </application>
