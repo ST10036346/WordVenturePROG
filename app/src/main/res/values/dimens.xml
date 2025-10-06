@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="level_button_width">300dp</dimen>
+    <dimen name="daily_tile_size">60dp</dimen>
+    <dimen name="tile_margin">4dp</dimen>
+
 </resources>

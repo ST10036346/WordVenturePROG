@@ -2,6 +2,6 @@
 <!-- res/drawable/tile_border.xml -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@android:color/transparent" />
+    <solid android:color="@android:color/white" />
     <stroke android:width="2dp" android:color="#D3D6DA" />
 </shape>
