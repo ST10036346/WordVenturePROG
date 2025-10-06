@@ -250,6 +250,18 @@ class Daily1 : AppCompatActivity() {
 
         binding.statsPanelContainer.visibility = View.VISIBLE
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
+
+        val playAgainButton = binding.statsPanel.playMoreButton
+        playAgainButton.visibility = View.GONE
+        // -----------------------
+
+        val mainMenuButton = binding.statsPanel.mainMenuButton
+
+        mainMenuButton.setOnClickListener {
+            val intent = Intent(this, MainMenu::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun fetchWordleWord() {

@@ -73,9 +73,8 @@ class StartMultiplayerMatch : AppCompatActivity() {
         }
 
         // You can also add one for the book icon to go home if you wish
-        binding.bookIcon.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+        binding.backIcon.setOnClickListener {
+            startActivity(Intent(this, EnterPlayerNamesActivity::class.java))
             finish() // Optional: finish Daily1 so the user can't go back to it
         }
         fetchWords()
