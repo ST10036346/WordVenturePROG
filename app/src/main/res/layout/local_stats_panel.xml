@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#E8E8D9">
+
+    <!-- 1. Title to announce the winner -->
+    <TextView
+        android:id="@+id/stats_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:fontFamily="@font/barriecito"
+        android:text="PLAYER 1 WINS!"
+        android:textColor="#051646"
+        android:textSize="34sp"
+        android:textStyle="bold" />
+
+    <!-- 2. Body to show the overall score -->
+    <TextView
+        android:id="@+id/stats_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="#D1C4E9"
+        android:fontFamily="@font/barriecito"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="SCORE\nPlayer 1: 0\nPlayer 2: 0"
+        android:textColor="#051646"
+        android:textSize="22sp" />
+
+    <!-- 3. Button to start a new game -->
+    <Button
+        android:id="@+id/play_again_button"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#C9BFFB"
+        android:fontFamily="@font/barriecito"
+        android:text="Play Again"
+        android:textColor="#051646"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- 4. Button to return to the menu -->
+    <Button
+        android:id="@+id/main_menu_button"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#C9BFFB"
+        android:fontFamily="@font/barriecito"
+        android:text="Main Menu"
+        android:textColor="#051646"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -1,5 +1,6 @@
 package com.st10036346.wordventure2
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
@@ -15,6 +16,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.graphics.drawable.DrawableCompat
 import com.st10036346.wordventure2.databinding.ActivityLocalMatchBinding
+import kotlin.jvm.java
 
 // Data class to hold the state of a single tile (its text and color)
 data class TileState(val text: String, val backgroundColor: Int, val textColor: Int)
@@ -40,6 +42,9 @@ class LocalMatch : AppCompatActivity() {
     private enum class LetterStatus { CORRECT, PRESENT, ABSENT }
     private val keyboardLetterStatus = mutableMapOf<Char, LetterStatus>()
     private lateinit var letterButtonMap: Map<Char, Button>
+
+    private var player1Name = "Player 1"
+    private var player2Name = "Player 2"
     // ------------------------------------
 
     // --- Board states for each player ---
@@ -48,6 +53,9 @@ class LocalMatch : AppCompatActivity() {
     private var player1CurrentRow = 0
     private var player2CurrentRow = 0
 
+    private var player1Wins = 0
+    private var player2Wins = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLocalMatchBinding.inflate(layoutInflater)
@@ -55,6 +63,12 @@ class LocalMatch : AppCompatActivity() {
 
         setupBoard()
         setupKeyboard() // This now initializes letterButtonMap
+
+        player1Name = intent.getStringExtra("PLAYER_1_NAME") ?: "Player 1"
+        player2Name = intent.getStringExtra("PLAYER_2_NAME") ?: "Player 2"
+        player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
+        player2TargetWord = intent.getStringExtra("PLAYER_2_TARGET_WORD")?.uppercase() ?: "ERROR"
+
 
         // --- Multiplayer Mode Setup ---
         player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
@@ -66,6 +80,30 @@ class LocalMatch : AppCompatActivity() {
         updatePlayerIndicator()
 
         binding.keyboardLayout.visibility = View.VISIBLE
+
+
+
+
+
+        binding.profileIcon.setOnClickListener {
+            // Create an Intent to start ProfileActivity
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 2. Settings Icon Click Listener
+        binding.settingsIcon.setOnClickListener {
+            // Create an Intent to start SettingsActivity
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
+        // You can also add one for the book icon to go home if you wish
+        binding.bookIcon.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish() // Optional: finish Daily1 so the user can't go back to it
+        }
     }
 
     private fun setupBoard() {
@@ -263,29 +301,61 @@ class LocalMatch : AppCompatActivity() {
 
     private fun updatePlayerIndicator() {
         if (activePlayer == 1) {
-            binding.screenTitle.text = "PLAYER 1'S TURN"
+            binding.screenTitle.text = "$player1Name 'S TURN"
         } else {
-            binding.screenTitle.text = "PLAYER 2'S TURN"
+            binding.screenTitle.text = "$player2Name 'S TURN"
         }
         // Removed toast messages as they are redundant with the title change
     }
 
+    // In LocalMatch.kt
+
     private fun showEndGamePanel(didWin: Boolean) {
         binding.keyboardLayout.visibility = View.GONE
         val statsTitle = binding.statsPanel.statsTitle
+        val statsBody = binding.statsPanel.statsBody // Assuming you have a TextView with this ID
 
         if (didWin) {
-            statsTitle.text = "Player $activePlayer Wins!"
-            val otherPlayer = if (activePlayer == 1) 2 else 1
-            val wordToReveal = if (activePlayer == 1) player2TargetWord else player1TargetWord
-            Toast.makeText(this, "Player $otherPlayer's word was: $wordToReveal", Toast.LENGTH_LONG).show()
+            if (activePlayer == 1) {
+                player1Wins++
+                statsTitle.text = "$player1Name Wins!"
+            } else {
+                player2Wins++
+                statsTitle.text = "$player2Name Wins!"
+            }
         } else {
             statsTitle.text = "It's a Draw!"
-            Toast.makeText(this, "P1 Word: $player2TargetWord | P2 Word: $player1TargetWord", Toast.LENGTH_LONG).show()
         }
+
+        // --- NEW: Display the overall score ---
+        statsBody.text = "SCORE\n$player1Name: $player1Wins\n$player2Name: $player2Wins"
+        statsBody.visibility = View.VISIBLE // Make sure the body is visible
+
         binding.statsPanelContainer.visibility = View.VISIBLE
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
+
+        // --- NEW: Setup "Play Again" and "Main Menu" buttons ---
+        val playAgainButton = binding.statsPanel.playAgainButton
+        val mainMenuButton = binding.statsPanel.mainMenuButton
+
+        playAgainButton.visibility = View.VISIBLE
+        mainMenuButton.visibility = View.VISIBLE
+
+        playAgainButton.setOnClickListener {
+            // Restart the activity with the same players and words but updated scores
+            val intent = Intent(this, StartMultiplayerMatch::class.java)
+            // You would typically restart the lobby to enter new words
+            startActivity(intent)
+            finish()
+        }
+
+        mainMenuButton.setOnClickListener {
+            val intent = Intent(this, MainMenu::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
+
 
     // --- UPDATED setupKeyboard() ---
     private fun setupKeyboard() {

@@ -1,5 +1,8 @@
 package com.st10036346.wordventure2
 
+import kotlin.text.uppercase
+
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
@@ -18,6 +21,10 @@ import com.st10036346.wordventure2.databinding.ActivityDaily1Binding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.jvm.java
 
 class Daily1 : AppCompatActivity() {
 
@@ -38,29 +45,28 @@ class Daily1 : AppCompatActivity() {
     }
     private val keyboardLetterStatus = mutableMapOf<Char, LetterStatus>()
     private lateinit var letterButtonMap: Map<Char, Button>
+    private var isReplayMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDaily1Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupNavigation()
+        isReplayMode = intent.getBooleanExtra("IS_REPLAY", false)
 
-        setupBoard()
-        setupKeyboard() // Initializes letterButtonMap
-
-        // Hide keyboard until word is fetched
-        binding.keyboardLayout.visibility = View.INVISIBLE
-        fetchWordleWord()
-    }
-
-    /**
-     * Sets up the functionality for the navigation icons in the header.
-     */
-    private fun setupNavigation() {
-        binding.backIcon.setOnClickListener {
-            finish()
+        // --- CORRECTED SETUP LOGIC ---
+        // The if/else block now correctly handles all setup scenarios without duplication.
+        if (isReplayMode) {
+            // SCENARIO 1: Replay a completed game
+            loadAndReplayGame()
+        } else {
+            // SCENARIO 2: Start a fresh game
+            setupBoard()
+            setupKeyboard()
+            binding.keyboardLayout.visibility = View.INVISIBLE // Hide keyboard until word is ready
+            fetchWordleWord()
         }
+        // The duplicate calls that were here have been removed.
 
         binding.profileIcon.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
@@ -71,15 +77,26 @@ class Daily1 : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+
+        binding.backIcon.setOnClickListener {
+            // Assuming this should go to MainMenu
+            val intent = Intent(this, MainMenu::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun setupBoard() {
+        // Clear previous views if any, to be safe
+        binding.boardGrid.removeAllViews()
         val defaultTileBg = ContextCompat.getDrawable(this, R.drawable.tile_border)
         for (i in 0 until rows) {
             for (j in 0 until cols) {
                 val tile = TextView(this).apply {
                     layoutParams = android.widget.GridLayout.LayoutParams().apply {
-                        width = 230; height = 230; setMargins(2, 2, 2, 2)
+                        width = 150
+                        height = 150
+                        setMargins(8, 8, 8, 8)
                     }
                     gravity = Gravity.CENTER
                     textSize = 32f
@@ -106,47 +123,72 @@ class Daily1 : AppCompatActivity() {
         }
     }
 
+    // --- THIS IS THE FULLY UPDATED onEnterPressed FUNCTION ---
+    // In Daily1.kt
+
+    // --- THIS IS THE FULLY UPDATED onEnterPressed FUNCTION ---
+    // In Daily1.kt
+
+    // --- THIS IS THE FULLY UPDATED and STABILIZED onEnterPressed FUNCTION ---
     private fun onEnterPressed() {
         if (currentCol != cols) {
             Toast.makeText(this, "Not enough letters", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }
+        val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }.uppercase()
+        val safeContext = this
+        val guessBody = WordGuess(guess) // Create the body object
+        // Disable UI to prevent multiple submissions
+        binding.keyboardLayout.isEnabled = false
 
-        // --- Grid Color Logic ---
-        val availableTargetLettersForGrid = targetWord.toMutableList()
-        val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Gray
-        for (j in 0 until cols) {
-            if (guess[j] == targetWord[j]) {
-                tileColors[j] = Color.parseColor("#6AAA64") // Green
-                availableTargetLettersForGrid[j] = ' '
-            }
-        }
-        for (j in 0 until cols) {
-            if (tileColors[j] != Color.parseColor("#6AAA64")) {
-                if (availableTargetLettersForGrid.contains(guess[j])) {
-                    tileColors[j] = Color.parseColor("#C9B458") // Yellow
-                    availableTargetLettersForGrid.indexOf(guess[j]).let { availableTargetLettersForGrid[it] = ' ' }
+        // Call the API to check if the word is valid
+        RetrofitClient.instance.checkWord(guessBody).enqueue(object : Callback<CheckWordResponse> {
+            override fun onResponse(call: Call<CheckWordResponse>, response: Response<CheckWordResponse>) {
+                // Check if the network call itself was successful (e.g., status 200 OK)
+                if (response.isSuccessful && response.body()?.valid == true) {
+                    // Word is VALID and response was successful
+                    runOnUiThread {
+                        proceedWithGuess(guess)
+                    }
+                } else {
+                    // Word is INVALID or response was unsuccessful (e.g., 404)
+                    // Use a Handler to post the UI update safely.
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        Toast.makeText(applicationContext, "Not in word list", Toast.LENGTH_SHORT).show()
+                        binding.keyboardLayout.isEnabled = true // Re-enable keyboard
+                    }, 50) // A small 50ms delay is enough to prevent the crash
                 }
             }
-        }
-        for (j in 0 until cols) {
-            tiles[currentRow][j]?.apply { setBackgroundColor(tileColors[j]); setTextColor(Color.WHITE) }
-        }
 
-        // --- Keyboard Coloring Logic ---
+            override fun onFailure(call: Call<CheckWordResponse>, t: Throwable) {
+                // This block runs for network errors (e.g., no internet)
+                android.util.Log.e("API_FAILURE", "Retrofit call failed", t)
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(safeContext, "Could not verify word", Toast.LENGTH_SHORT).show()
+                    binding.keyboardLayout.isEnabled = true // Re-enable keyboard
+                }
+            }
+        })
+    }
+
+
+
+    // --- NEW HELPER FUNCTION TO CONTAIN LOGIC AFTER VALIDATION ---
+    private fun proceedWithGuess(guess: String) {
+        // 1. Color the grid row
+        colorGridRow(guess, currentRow)
+
+        // 2. Update keyboard colors
         for (j in 0 until cols) {
             val letter = guess[j]
             if (letter == targetWord[j]) {
                 keyboardLetterStatus[letter] = LetterStatus.CORRECT
             } else if (targetWord.contains(letter)) {
-                // Only mark as PRESENT if not already CORRECT
                 if (keyboardLetterStatus[letter] != LetterStatus.CORRECT) {
                     keyboardLetterStatus[letter] = LetterStatus.PRESENT
                 }
             } else {
-                // Only mark as ABSENT if we don't know its status yet
                 if (!keyboardLetterStatus.containsKey(letter)) {
                     keyboardLetterStatus[letter] = LetterStatus.ABSENT
                 }
@@ -154,27 +196,30 @@ class Daily1 : AppCompatActivity() {
         }
         updateKeyboardAppearance()
 
-        // --- Win/Loss Check ---
+        // 3. Check for a win
         if (guess.equals(targetWord, ignoreCase = true)) {
-            // Delay showing stats panel to let user see winning colors
+            binding.keyboardLayout.isEnabled = false
             Handler(Looper.getMainLooper()).postDelayed({
                 showStatsPanel(didWin = true)
             }, 1000)
             return
         }
 
+        // 4. Move to the next row or end the game if it's a loss
         currentRow++
         currentCol = 0
 
         if (currentRow >= rows) {
-            // Delay showing stats panel to let user see final guess colors
+            binding.keyboardLayout.isEnabled = false
             Handler(Looper.getMainLooper()).postDelayed({
                 showStatsPanel(didWin = false)
             }, 1000)
+        } else {
+            // Re-enable keyboard for the next turn if the game is not over
+            binding.keyboardLayout.isEnabled = true
         }
     }
 
-    // --- New Keyboard Helper Function ---
     private fun updateKeyboardAppearance() {
         for ((char, button) in letterButtonMap) {
             val status = keyboardLetterStatus[char] ?: continue
@@ -201,28 +246,31 @@ class Daily1 : AppCompatActivity() {
         }
         binding.statsPanelContainer.visibility = View.VISIBLE
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
+        if (!isReplayMode) {
+            saveCompletedGame(didWin)
+        }
     }
 
     private fun fetchWordleWord() {
         RetrofitClient.instance.getRandomWord().enqueue(object : Callback<WordResponse> {
             override fun onResponse(call: Call<WordResponse>, response: Response<WordResponse>) {
-                binding.keyboardLayout.visibility = View.VISIBLE
                 if (response.isSuccessful) {
                     targetWord = response.body()?.word?.uppercase() ?: "APPLE"
+                    binding.keyboardLayout.visibility = View.VISIBLE
                 } else {
                     targetWord = "ERROR"
                     Toast.makeText(this@Daily1, "Failed to get a word.", Toast.LENGTH_LONG).show()
                 }
             }
+
             override fun onFailure(call: Call<WordResponse>, t: Throwable) {
-                binding.keyboardLayout.visibility = View.VISIBLE
                 targetWord = "LOCAL" // Fallback for network failure
+                binding.keyboardLayout.visibility = View.VISIBLE
                 Toast.makeText(this@Daily1, "Network Error. Using default word.", Toast.LENGTH_LONG).show()
             }
         })
     }
 
-    // --- Updated setupKeyboard() ---
     private fun setupKeyboard() {
         letterButtonMap = mapOf(
             'Q' to binding.buttonQ, 'W' to binding.buttonW, 'E' to binding.buttonE,
@@ -238,5 +286,86 @@ class Daily1 : AppCompatActivity() {
         for ((letter, button) in letterButtonMap) { button.setOnClickListener { onLetterPressed(letter) } }
         binding.buttonEnter.setOnClickListener { onEnterPressed() }
         binding.buttonDelete.setOnClickListener { onBackPressedCustom() }
+    }
+
+    private fun saveCompletedGame(didWin: Boolean) {
+        val prefs = getSharedPreferences("DailyChallenge", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val gridState = (0 until currentRow + 1).joinToString(";") { i ->
+            (0 until cols).joinToString(",") { j ->
+                tiles[i][j]?.text.toString()
+            }
+        }
+        editor.putString("lastPlayDate", today)
+        editor.putString("savedGridState", gridState)
+        editor.putString("savedTargetWord", targetWord)
+        editor.putBoolean("didWin", didWin)
+        editor.apply()
+    }
+
+    private fun loadAndReplayGame() {
+        val prefs = getSharedPreferences("DailyChallenge", Context.MODE_PRIVATE)
+        targetWord = prefs.getString("savedTargetWord", "") ?: ""
+        val savedGridState = prefs.getString("savedGridState", "") ?: ""
+        val didWin = prefs.getBoolean("didWin", false)
+
+        if (targetWord.isEmpty() || savedGridState.isEmpty()) {
+            setupBoard()
+            setupKeyboard()
+            fetchWordleWord()
+            return
+        }
+
+        setupBoard()
+
+        val savedRows = savedGridState.split(";")
+        savedRows.forEachIndexed { i, rowString ->
+            if (i < rows) { // Check to prevent index out of bounds
+                currentRow = i
+                val letters = rowString.split(",")
+                letters.forEachIndexed { j, letter ->
+                    if (j < cols) {
+                        tiles[i][j]?.text = letter
+                    }
+                }
+                val guess = (0 until cols).joinToString("") { j -> tiles[i][j]?.text.toString() }
+                colorGridRow(guess, i)
+            }
+        }
+
+        showStatsPanel(didWin)
+        binding.keyboardLayout.visibility = View.GONE
+    }
+
+    private fun colorGridRow(guess: String, row: Int) {
+        val availableTargetLetters = targetWord.toMutableList()
+        val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Default Gray
+
+        for (j in 0 until cols) {
+            if (guess.length > j && targetWord.length > j && guess[j] == targetWord[j]) {
+                tileColors[j] = Color.parseColor("#6AAA64") // Green
+                availableTargetLetters[j] = ' '
+            }
+        }
+        for (j in 0 until cols) {
+            if (tileColors[j] != Color.parseColor("#6AAA64")) {
+                if (guess.length > j && availableTargetLetters.contains(guess[j])) {
+                    tileColors[j] = Color.parseColor("#C9B458") // Yellow
+                    val index = availableTargetLetters.indexOf(guess[j])
+                    if (index != -1) {
+                        availableTargetLetters[index] = ' '
+                    }
+                }
+            }
+        }
+        for (j in 0 until cols) {
+            if (row < rows && j < cols) {
+                tiles[row][j]?.apply {
+                    setBackgroundColor(tileColors[j])
+                    setTextColor(Color.WHITE)
+                }
+            }
+        }
     }
 }
