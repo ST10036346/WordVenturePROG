@@ -30,6 +30,7 @@
         android:layout_marginEnd="16dp">
 
         <LinearLayout
+            android:id="@+id/stats_metrics_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -106,6 +107,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/guess_distribution_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"

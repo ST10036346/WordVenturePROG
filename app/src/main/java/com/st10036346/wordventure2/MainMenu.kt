@@ -10,13 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-// Add these required imports
 import android.content.Context
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-// Remove the extra "class" keyword from the import line
-// class <-- This was causing a syntax error
 
 class MainMenu : AppCompatActivity() {
 
@@ -32,7 +29,7 @@ class MainMenu : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        // --- Your existing user login check (This is good!) ---
+        // --- User login check ---
         if (auth.currentUser == null) {
             Log.e(TAG, "User is not logged in. Redirecting to Login.")
             Toast.makeText(this, "Session expired, please log in again.", Toast.LENGTH_LONG).show()
@@ -52,13 +49,11 @@ class MainMenu : AppCompatActivity() {
         val profileIcon: ImageView = findViewById(R.id.profileIcon)
         val settingsIcon: ImageView = findViewById(R.id.settingsIcon)
 
-        // --- UPDATED Daily Button Click Listener ---
+        // --- Daily Button Click Listener (Launches Daily1) ---
         dailyButton.setOnClickListener {
             // Access SharedPreferences to check the last play date
             val prefs = getSharedPreferences("DailyChallenge", Context.MODE_PRIVATE)
             val lastPlayDate = prefs.getString("lastPlayDate", null)
-
-            // Get today's date in the same format ("yyyy-MM-dd")
             val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
             Log.d(TAG, "Daily button clicked. Today: $today, Last Play Date: $lastPlayDate")
@@ -78,17 +73,18 @@ class MainMenu : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // --- The rest of your listeners remain the same ---
+        // --- UPDATED: Play Button Click Listener (Launches Levels) ---
         playButton.setOnClickListener {
-            Log.d(TAG, "Play button clicked. Navigating to Daily1.")
-            // The regular play button should always start a fresh game
-            val intent = Intent(this, Daily1::class.java)
-            intent.putExtra("IS_REPLAY", false) // Explicitly set to false
+            Log.d(TAG, "Play button clicked. Navigating to Levels screen.")
+
+            // Direct the player to the Levels activity
+            // 💡 IMPORTANT: Ensure 'LevelsActivity' is the correct class name for your Levels screen.
+            val intent = Intent(this, Levels::class.java)
+
             startActivity(intent)
         }
 
         multiplayerButton.setOnClickListener {
-            // Changed this to navigate to Muliplayer activity
             startActivity(Intent(this, Muliplayer::class.java))
         }
 

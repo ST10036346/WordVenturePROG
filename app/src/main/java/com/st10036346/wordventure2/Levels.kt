@@ -12,7 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import com.st10036346.wordventure2.R // Ensure R is imported
+import com.st10036346.wordventure2.R
 import com.st10036346.wordventure2.databinding.ActivityLevelsBinding
 
 class Levels : AppCompatActivity() {
@@ -42,7 +42,9 @@ class Levels : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        // Back icon goes to the previous screen (Main Menu, based on navigation flow)
         binding.backIcon.setOnClickListener { finish() }
+
         // Assuming ProfileActivity and SettingsActivity exist
         binding.profileIcon.setOnClickListener { startActivity(Intent(this, ProfileActivity::class.java)) }
         binding.settingsIcon.setOnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) }
@@ -53,18 +55,6 @@ class Levels : AppCompatActivity() {
         // Default to 1 (Level 1 is always unlocked)
         return prefs.getInt(KEY_UNLOCKED_LEVEL, 1)
     }
-
-    // NOTE: This function is for illustration; you'll implement the actual save logic
-    // in your game activity (Daily1.kt) upon a win.
-    /*
-    fun saveProgress(levelCompleted: Int) {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val nextLevel = levelCompleted + 1
-        if (nextLevel <= MAX_DISPLAY_LEVEL) {
-             prefs.edit().putInt(KEY_UNLOCKED_LEVEL, nextLevel).apply()
-        }
-    }
-    */
 
     private fun displayLevelButtons() {
         val container = binding.levelsContainer
@@ -92,7 +82,7 @@ class Levels : AppCompatActivity() {
                         gravity = Gravity.CENTER_HORIZONTAL
                     }
                     text = "--- COMPLETED LEVELS ---"
-                    // FIX: Use setTypeface for Monospace font
+                    // Set Typeface for Monospace font
                     setTypeface(Typeface.MONOSPACE, Typeface.NORMAL)
                     textSize = 12f
                     setTextColor(Color.parseColor("#051646"))
@@ -107,9 +97,9 @@ class Levels : AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
                 text = "🎉 You have completed all known levels! 🎉"
-                // FIX: Use setTypeface for custom font or fallback
+                // Use custom font or fallback
                 try {
-                    val customFont = ResourcesCompat.getFont(context, R.font.comic_relief)
+                    val customFont = ResourcesCompat.getFont(context, R.font.barriecito) // Using barriecito for consistency
                     setTypeface(customFont, Typeface.BOLD)
                 } catch (e: Exception) {
                     setTypeface(null, Typeface.BOLD)
@@ -155,7 +145,7 @@ class Levels : AppCompatActivity() {
             setBackgroundColor(buttonColor)
             setTextColor(Color.WHITE)
 
-            // FIX: Correct way to set a custom font programmatically
+            // Correct way to set a custom font programmatically
             try {
                 // R.font.barriecito is a common header font used in your prior XML
                 val customFont = ResourcesCompat.getFont(context, R.font.barriecito)
@@ -169,7 +159,9 @@ class Levels : AppCompatActivity() {
 
     private fun startLevel(levelNum: Int) {
         Toast.makeText(this, "Starting Level $levelNum...", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, Daily1::class.java).apply {
+
+        // --- FIXED: Change the target activity from Daily1 to Play ---
+        val intent = Intent(this, Play::class.java).apply {
             // Pass the level number to the game activity
             putExtra("LEVEL_NUMBER", levelNum)
         }
