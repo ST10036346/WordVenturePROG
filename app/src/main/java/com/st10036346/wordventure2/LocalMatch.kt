@@ -53,37 +53,34 @@ class LocalMatch : AppCompatActivity() {
     private var player1CurrentRow = 0
     private var player2CurrentRow = 0
 
-    private var player1Wins = 0
-    private var player2Wins = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLocalMatchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // --- 1. Correctly load names and target words ONCE ---
+        player1Name = intent.getStringExtra("PLAYER_1_NAME")?.uppercase() ?: "PLAYER 1"
+        player2Name = intent.getStringExtra("PLAYER_2_NAME")?.uppercase() ?: "PLAYER 2"
+
+        // The word FOR Player 1 (chosen by P2) is sent by the lobby under the key "PLAYER_1_TARGET_WORD"
+        player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
+
+        // The word FOR Player 2 (chosen by P1) is sent by the lobby under the key "PLAYER_2_TARGET_WORD"
+        player2TargetWord = intent.getStringExtra("PLAYER_2_TARGET_WORD")?.uppercase() ?: "ERROR"
+        // -----------------------------------------------------------------
+
         setupBoard()
-        setupKeyboard() // This now initializes letterButtonMap
+        setupKeyboard() // Make sure this is called AFTER letterButtonMap might be needed
 
-        player1Name = intent.getStringExtra("PLAYER_1_NAME") ?: "Player 1"
-        player2Name = intent.getStringExtra("PLAYER_2_NAME") ?: "Player 2"
-        player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
-        player2TargetWord = intent.getStringExtra("PLAYER_2_TARGET_WORD")?.uppercase() ?: "ERROR"
-
-
-        // --- Multiplayer Mode Setup ---
-        player1TargetWord = intent.getStringExtra("PLAYER_1_TARGET_WORD")?.uppercase() ?: "ERROR"
-        player2TargetWord = intent.getStringExtra("PLAYER_2_TARGET_WORD")?.uppercase() ?: "ERROR"
-
-        // Player 1 starts
+        // --- 2. Set the Initial Game State ---
         activePlayer = 1
-        targetWord = player1TargetWord // P1 guesses P2's word
-        updatePlayerIndicator()
+        targetWord = player1TargetWord // Player 1 starts by guessing THEIR target word
 
+        // --- 3. Update the UI with the initial state ---
+        updatePlayerIndicator() // This will now use the correct player name
         binding.keyboardLayout.visibility = View.VISIBLE
-
-
-
-
 
         binding.profileIcon.setOnClickListener {
             // Create an Intent to start ProfileActivity
@@ -140,6 +137,8 @@ class LocalMatch : AppCompatActivity() {
     }
 
     // --- THIS IS THE UPDATED FUNCTION ---
+    // In LocalMatch.kt
+
     private fun onEnterPressed() {
         if (currentCol != cols) {
             Toast.makeText(this, "Not enough letters", Toast.LENGTH_SHORT).show()
@@ -148,13 +147,14 @@ class LocalMatch : AppCompatActivity() {
 
         val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }
 
-        // --- Grid Color Logic (from your original code) ---
+        // --- Grid and Keyboard Coloring Logic (This part is fine and remains) ---
         val availableTargetLettersForGrid = targetWord.toMutableList()
         val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Gray
         for (j in 0 until cols) {
             if (guess[j] == targetWord[j]) {
                 tileColors[j] = Color.parseColor("#6AAA64") // Green
                 availableTargetLettersForGrid[j] = ' '
+                keyboardLetterStatus[guess[j]] = LetterStatus.CORRECT
             }
         }
         for (j in 0 until cols) {
@@ -162,111 +162,112 @@ class LocalMatch : AppCompatActivity() {
                 if (availableTargetLettersForGrid.contains(guess[j])) {
                     tileColors[j] = Color.parseColor("#C9B458") // Yellow
                     availableTargetLettersForGrid[availableTargetLettersForGrid.indexOf(guess[j])] = ' '
+                    if (keyboardLetterStatus[guess[j]] != LetterStatus.CORRECT) {
+                        keyboardLetterStatus[guess[j]] = LetterStatus.PRESENT
+                    }
+                } else {
+                    if (keyboardLetterStatus[guess[j]] != LetterStatus.CORRECT && keyboardLetterStatus[guess[j]] != LetterStatus.PRESENT) {
+                        keyboardLetterStatus[guess[j]] = LetterStatus.ABSENT
+                    }
                 }
             }
         }
         for (j in 0 until cols) {
             tiles[currentRow][j]?.apply { setBackgroundColor(tileColors[j]); setTextColor(Color.WHITE) }
         }
+        updateKeyboardAppearance()
+        // --- End Coloring Logic ---
 
-        // --- NEW: Keyboard Coloring Logic ---
-        for (j in 0 until cols) {
-            val letter = guess[j]
-            // First pass for CORRECT (Green) letters to give them priority
-            if (letter == targetWord[j]) {
-                keyboardLetterStatus[letter] = LetterStatus.CORRECT
-            }
-            // Second pass for PRESENT (Yellow) and ABSENT (Gray) letters
-            else {
-                val isPresent = targetWord.contains(letter)
-                // Only update if it's not already marked as CORRECT
-                if (keyboardLetterStatus[letter] != LetterStatus.CORRECT) {
-                    if (isPresent) {
-                        // Don't downgrade from PRESENT to ABSENT
-                        if (keyboardLetterStatus[letter] != LetterStatus.PRESENT) {
-                            keyboardLetterStatus[letter] = LetterStatus.PRESENT
-                        }
-                    } else {
-                        // Only mark as ABSENT if we haven't found it to be PRESENT or CORRECT before
-                        if (!keyboardLetterStatus.containsKey(letter)) {
-                            keyboardLetterStatus[letter] = LetterStatus.ABSENT
-                        }
-                    }
-                }
-            }
-        }
-        updateKeyboardAppearance() // Apply the new colors
 
-        // --- Win condition check ---
+        // --- NEW Win/Switch Logic ---
         if (guess.equals(targetWord, ignoreCase = true)) {
-            // Use a short delay so the player can see the winning colors
-            Handler(Looper.getMainLooper()).postDelayed({
-                showEndGamePanel(didWin = true)
-            }, 1000)
-            return
+            // Player guessed correctly. End the game.
+            binding.keyboardLayout.isEnabled = false
+            Handler(Looper.getMainLooper()).postDelayed({ showEndGamePanel(didWin = true) }, 1000)
+            return // Stop further execution
         }
 
-        // --- Turn switching logic (from your original code) ---
-        binding.keyboardLayout.isEnabled = false
+        // --- THIS IS THE KEY CHANGE ---
+        // If it wasn't a win, immediately switch to the other player.
+        binding.keyboardLayout.isEnabled = false // Disable keyboard during switch
         Handler(Looper.getMainLooper()).postDelayed({
-            currentRow++
-            currentCol = 0
-
-            if (currentRow >= rows) {
-                if ((activePlayer == 1 && player2CurrentRow >= rows) || (activePlayer == 2 && player1CurrentRow >= rows)) {
-                    showEndGamePanel(didWin = false) // Both players lost (draw)
-                } else {
-                    switchPlayer()
-                }
+            // Before switching, check if the board is full (a draw)
+            if (currentRow == rows - 1) {
+                showEndGamePanel(didWin = false) // Last guess was made, and no one won
             } else {
-                switchPlayer()
+                switchPlayer() // Switch to the other player's turn
             }
-            binding.keyboardLayout.isEnabled = true
-        }, 2000)
+        }, 1500) // Delay to show colors before switching
     }
+
+
 
     // --- NEW HELPER FUNCTION ---
-    private fun updateKeyboardAppearance() {
+    // In LocalMatch.kt
+    private fun updateKeyboardAppearance(reset: Boolean = false) {
+        val defaultKeyBg = ContextCompat.getDrawable(this, R.drawable.key_background) // Make sure you have this drawable
         for ((char, button) in letterButtonMap) {
-            val status = keyboardLetterStatus[char] ?: continue // Get status for this character
+            if (reset) {
+                // Reset to default state
+                button.background = defaultKeyBg
+                button.setTextColor(Color.BLACK) // Or your default text color
+            } else {
+                val status = keyboardLetterStatus[char] ?: continue
 
-            val color = when (status) {
-                LetterStatus.CORRECT -> Color.parseColor("#6AAA64") // Green
-                LetterStatus.PRESENT -> Color.parseColor("#C9B458") // Yellow
-                LetterStatus.ABSENT -> Color.parseColor("#787C7E")   // Gray
+                val color = when (status) {
+                    LetterStatus.CORRECT -> Color.parseColor("#6AAA64") // Green
+                    LetterStatus.PRESENT -> Color.parseColor("#C9B458") // Yellow
+                    LetterStatus.ABSENT -> Color.parseColor("#787C7E")   // Gray
+                }
+
+                val drawable = button.background
+                DrawableCompat.setTint(drawable, color)
+                button.setTextColor(Color.WHITE)
             }
-
-            // Use DrawableCompat to safely change the background tint of the key
-            val drawable = button.background
-            DrawableCompat.setTint(drawable, color)
-            button.setTextColor(Color.WHITE) // Change text to white for better contrast
         }
     }
 
+
+    // In LocalMatch.kt
+    // In LocalMatch.kt
+
     private fun switchPlayer() {
+        // 1. Save the board state of the player who just finished.
         if (activePlayer == 1) {
-            player1CurrentRow = currentRow
             saveBoardState(player1BoardState)
         } else {
-            player2CurrentRow = currentRow
             saveBoardState(player2BoardState)
         }
 
+        // 2. Switch the active player.
         activePlayer = if (activePlayer == 1) 2 else 1
 
+        // 3. Move to the next row for the NEW player if it's Player 1's turn again.
+        // This ensures the row only increments after both players have had a turn.
         if (activePlayer == 1) {
-            currentRow = player1CurrentRow
+            currentRow++
+        }
+
+        // 4. Load the board state for the NEW player.
+        if (activePlayer == 1) {
             targetWord = player1TargetWord
             loadBoardState(player1BoardState)
-        } else {
-            currentRow = player2CurrentRow
+        } else { // activePlayer is 2
             targetWord = player2TargetWord
             loadBoardState(player2BoardState)
         }
+
+        // 5. Reset column and keyboard for the new turn.
         currentCol = 0
+        keyboardLetterStatus.clear()
+        updateKeyboardAppearance(reset = true)
+
+        // 6. Update the UI.
         updatePlayerIndicator()
         binding.keyboardLayout.isEnabled = true
     }
+
+
 
     private fun saveBoardState(boardState: Array<Array<TileState>>) {
         for (i in 0 until rows) {
@@ -301,9 +302,9 @@ class LocalMatch : AppCompatActivity() {
 
     private fun updatePlayerIndicator() {
         if (activePlayer == 1) {
-            binding.screenTitle.text = "$player1Name 'S TURN"
+            binding.screenTitle.text = "$player1Name'S TURN"
         } else {
-            binding.screenTitle.text = "$player2Name 'S TURN"
+            binding.screenTitle.text = "$player2Name'S TURN"
         }
         // Removed toast messages as they are redundant with the title change
     }
@@ -317,10 +318,10 @@ class LocalMatch : AppCompatActivity() {
 
         if (didWin) {
             if (activePlayer == 1) {
-                player1Wins++
+                MultiplayerScore.player1Wins++
                 statsTitle.text = "$player1Name Wins!"
             } else {
-                player2Wins++
+                MultiplayerScore.player2Wins++
                 statsTitle.text = "$player2Name Wins!"
             }
         } else {
@@ -328,8 +329,8 @@ class LocalMatch : AppCompatActivity() {
         }
 
         // --- NEW: Display the overall score ---
-        statsBody.text = "SCORE\n$player1Name: $player1Wins\n$player2Name: $player2Wins"
-        statsBody.visibility = View.VISIBLE // Make sure the body is visible
+        statsBody.text = "SCORE\n$player1Name: ${MultiplayerScore.player1Wins}\n$player2Name: ${MultiplayerScore.player2Wins}"
+        statsBody.visibility = View.VISIBLE
 
         binding.statsPanelContainer.visibility = View.VISIBLE
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
@@ -342,14 +343,18 @@ class LocalMatch : AppCompatActivity() {
         mainMenuButton.visibility = View.VISIBLE
 
         playAgainButton.setOnClickListener {
-            // Restart the activity with the same players and words but updated scores
-            val intent = Intent(this, StartMultiplayerMatch::class.java)
-            // You would typically restart the lobby to enter new words
+            // --- THIS IS THE FIX for names disappearing ---
+            // When playing again, we must pass the player names back to the lobby.
+            val intent = Intent(this, StartMultiplayerMatch::class.java).apply {
+                putExtra("PLAYER_1_NAME", player1Name)
+                putExtra("PLAYER_2_NAME", player2Name)
+            }
             startActivity(intent)
             finish()
         }
 
         mainMenuButton.setOnClickListener {
+            MultiplayerScore.reset()
             val intent = Intent(this, MainMenu::class.java)
             startActivity(intent)
             finish()
