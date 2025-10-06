@@ -40,7 +40,11 @@ class LocalMatch : AppCompatActivity() {
 
     // --- NEW: Keyboard State Management ---
     private enum class LetterStatus { CORRECT, PRESENT, ABSENT }
-    private val keyboardLetterStatus = mutableMapOf<Char, LetterStatus>()
+    private val player1KeyboardStatus = mutableMapOf<Char, LetterStatus>()
+    private val player2KeyboardStatus = mutableMapOf<Char, LetterStatus>()
+
+    // We also need a variable to hold the CURRENT player's map easily.
+    private var activeKeyboardStatus = player1KeyboardStatus
     private lateinit var letterButtonMap: Map<Char, Button>
 
     private var player1Name = "Player 1"
@@ -154,7 +158,7 @@ class LocalMatch : AppCompatActivity() {
             if (guess[j] == targetWord[j]) {
                 tileColors[j] = Color.parseColor("#6AAA64") // Green
                 availableTargetLettersForGrid[j] = ' '
-                keyboardLetterStatus[guess[j]] = LetterStatus.CORRECT
+                activeKeyboardStatus[guess[j]] = LetterStatus.CORRECT
             }
         }
         for (j in 0 until cols) {
@@ -162,12 +166,12 @@ class LocalMatch : AppCompatActivity() {
                 if (availableTargetLettersForGrid.contains(guess[j])) {
                     tileColors[j] = Color.parseColor("#C9B458") // Yellow
                     availableTargetLettersForGrid[availableTargetLettersForGrid.indexOf(guess[j])] = ' '
-                    if (keyboardLetterStatus[guess[j]] != LetterStatus.CORRECT) {
-                        keyboardLetterStatus[guess[j]] = LetterStatus.PRESENT
+                    if (activeKeyboardStatus[guess[j]] != LetterStatus.CORRECT) {
+                        activeKeyboardStatus[guess[j]] = LetterStatus.PRESENT
                     }
                 } else {
-                    if (keyboardLetterStatus[guess[j]] != LetterStatus.CORRECT && keyboardLetterStatus[guess[j]] != LetterStatus.PRESENT) {
-                        keyboardLetterStatus[guess[j]] = LetterStatus.ABSENT
+                    if (activeKeyboardStatus[guess[j]] != LetterStatus.CORRECT && activeKeyboardStatus[guess[j]] != LetterStatus.PRESENT) {
+                        activeKeyboardStatus[guess[j]] = LetterStatus.ABSENT
                     }
                 }
             }
@@ -204,22 +208,33 @@ class LocalMatch : AppCompatActivity() {
 
     // --- NEW HELPER FUNCTION ---
     // In LocalMatch.kt
-    private fun updateKeyboardAppearance(reset: Boolean = false) {
-        val defaultKeyBg = ContextCompat.getDrawable(this, R.drawable.key_background) // Make sure you have this drawable
-        for ((char, button) in letterButtonMap) {
-            if (reset) {
-                // Reset to default state
-                button.background = defaultKeyBg
-                button.setTextColor(Color.BLACK) // Or your default text color
-            } else {
-                val status = keyboardLetterStatus[char] ?: continue
+    // In LocalMatch.kt
 
+    // In LocalMatch.kt
+
+    private fun updateKeyboardAppearance() {
+        for ((char, button) in letterButtonMap) {
+            // --- THIS IS THE FIX ---
+            // 1. Get a NEW, MUTABLE copy of the default background for every button.
+            val defaultKeyBg = ContextCompat.getDrawable(this, R.drawable.key_background)?.mutate()
+
+            // 2. Reset the button to its default state.
+            button.background = defaultKeyBg
+            button.setTextColor(Color.BLACK) // Or your default text color
+
+            // 3. THEN, check the active player's map for a specific status.
+            val status = activeKeyboardStatus[char]
+
+            // 4. If a status exists, apply the corresponding color.
+            if (status != null) {
                 val color = when (status) {
                     LetterStatus.CORRECT -> Color.parseColor("#6AAA64") // Green
                     LetterStatus.PRESENT -> Color.parseColor("#C9B458") // Yellow
                     LetterStatus.ABSENT -> Color.parseColor("#787C7E")   // Gray
                 }
 
+                // Get the button's current background and apply a tint.
+                // Since we created a mutable copy, this won't affect other buttons.
                 val drawable = button.background
                 DrawableCompat.setTint(drawable, color)
                 button.setTextColor(Color.WHITE)
@@ -228,44 +243,49 @@ class LocalMatch : AppCompatActivity() {
     }
 
 
+
+
     // In LocalMatch.kt
     // In LocalMatch.kt
 
+    // In LocalMatch.kt
+
     private fun switchPlayer() {
-        // 1. Save the board state of the player who just finished.
+        // 1. Save board state of the player who just finished.
         if (activePlayer == 1) {
             saveBoardState(player1BoardState)
         } else {
             saveBoardState(player2BoardState)
         }
 
-        // 2. Switch the active player.
+        // 2. Switch the active player number.
         activePlayer = if (activePlayer == 1) 2 else 1
 
-        // 3. Move to the next row for the NEW player if it's Player 1's turn again.
-        // This ensures the row only increments after both players have had a turn.
+        // 3. Move to the next row if it's Player 1's turn again.
         if (activePlayer == 1) {
             currentRow++
         }
 
-        // 4. Load the board state for the NEW player.
+        // 4. Load the state for the NEW player.
         if (activePlayer == 1) {
             targetWord = player1TargetWord
+            activeKeyboardStatus = player1KeyboardStatus // <--- Set P1's keyboard state as active
             loadBoardState(player1BoardState)
         } else { // activePlayer is 2
             targetWord = player2TargetWord
+            activeKeyboardStatus = player2KeyboardStatus // <--- Set P2's keyboard state as active
             loadBoardState(player2BoardState)
         }
 
-        // 5. Reset column and keyboard for the new turn.
+        // 5. Reset column for the new turn.
         currentCol = 0
-        keyboardLetterStatus.clear()
-        updateKeyboardAppearance(reset = true)
 
-        // 6. Update the UI.
+        // 6. Update the UI. (NO MORE KEYBOARD RESET)
+        updateKeyboardAppearance() // This now redraws the keyboard with the new active player's map
         updatePlayerIndicator()
         binding.keyboardLayout.isEnabled = true
     }
+
 
 
 
