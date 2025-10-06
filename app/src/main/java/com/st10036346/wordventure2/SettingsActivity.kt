@@ -8,20 +8,22 @@ import android.os.Bundle
 import android.view.Gravity
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import android.content.ClipData // Required for clipboard copying
+import android.content.ClipData
 import com.st10036346.wordventure2.databinding.ActivitySettingsBinding
 
 /**
- * Activity for managing game settings like Dark Mode, Sound, and navigation to other settings screens.
- * Uses View Binding for cleaner and safer view access, matching the Daily1 activity structure.
+ * Activity for managing game settings like sound and navigation to other settings screens.
  */
 class SettingsActivity : AppCompatActivity() {
 
-    // 1. Declare the binding variable.
     private lateinit var binding: ActivitySettingsBinding
 
     // SharedPreferences name for saving user preferences
+    /**
+     * Android Developers, 2025.
+     * Save Key-Value Data
+     * Available at: https://developer.android.com/training/data-storage/shared-preferences
+     */
     private val PREFS_NAME = "GameSettings"
     private val KEY_SOUND = "isSoundEnabled"
 
@@ -31,28 +33,25 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 2. Inflate the layout using View Binding and set the content view.
-        // This line requires viewBinding = true in your build.gradle (module: app)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize SharedPreferences
+        // initialise SharedPreferences
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-        // Set initial state of switches based on saved preferences
+        // set initial state of switches based on saved preferences
         setInitialState()
 
-        // Set up all interactive elements
+        // set up all interactive elements
         setListeners()
     }
 
     /**
-     * Loads saved preferences and sets the initial state of the UI elements.
+     * Loads saved preferences.
      */
     private fun setInitialState() {
         val isSound = prefs.getBoolean(KEY_SOUND, true) // Default to sound on
 
-        // Use binding to access the switches
         binding.soundSwitch.isChecked = isSound
 
     }
@@ -61,31 +60,26 @@ class SettingsActivity : AppCompatActivity() {
      * Sets up all click and change listeners for navigation and settings toggles.
      */
     private fun setListeners() {
-        // --- Header Navigation (Using binding) ---
         binding.bookIcon.setOnClickListener {
-            // Navigate back to the Main Menu.
+            // navigate to the Main Menu.
             startActivity(Intent(this, MainMenu::class.java))
             finish()
         }
 
         binding.profileIcon.setOnClickListener {
-            // Navigate to the Profile Page
+            // navigate to the Profile Page
             startActivity(Intent(this, ProfileActivity::class.java))
         }
 
-        // --- Settings Toggles (Using binding) ---
-
-        // 🟢 Sound Switch Listener: ADD CALL TO MUSIC SERVICE HERE
+        // soundSwitch Listener
         binding.soundSwitch.setOnCheckedChangeListener { _, isChecked ->
-            // 1. Save the new preference
+            // save the new preference
             prefs.edit().putBoolean(KEY_SOUND, isChecked).apply()
 
-            // 2. Call the static function in the BackgroundMusicService to control volume
-            // isChecked = true (Sound ON) -> Muted is false
-            // isChecked = false (Sound OFF) -> Muted is true
+            // call function in BackgroundMusicService to control volume
             BackgroundMusicService.setVolume(!isChecked)
 
-            val toastMessage = if (isChecked) "Sound On" else "Sound Off (Muted)"
+            val toastMessage = if (isChecked) "Sound On" else "Sound Off"
             Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
         }
 
@@ -103,18 +97,6 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Applies the selected theme mode (Dark or Light) to the entire application.
-     */
-    private fun applyTheme(isDark: Boolean) {
-        val mode = if (isDark) {
-            AppCompatDelegate.MODE_NIGHT_YES
-        } else {
-            AppCompatDelegate.MODE_NIGHT_NO
-        }
-        AppCompatDelegate.setDefaultNightMode(mode)
-    }
-
-    /**
      * Shows a custom dialog with the contact email for Help & Support.
      */
     private fun showHelpSupportDialog() {
@@ -124,7 +106,12 @@ class SettingsActivity : AppCompatActivity() {
             .setTitle("Help & Support")
             .setMessage("For any questions or issues, please email us at:\n\n$emailAddress")
             .setPositiveButton("Copy Email") { dialog, _ ->
-                // Copy email address to clipboard
+                // copy email to clipboard
+                /**
+                 * Android Developers, 2025.
+                 * Copy and Paste
+                 * Available at:https://developer.android.com/develop/ui/views/touch-and-input/copy-paste
+                 */
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                 val clip = ClipData.newPlainText("Support Email", emailAddress)
                 clipboard.setPrimaryClip(clip)

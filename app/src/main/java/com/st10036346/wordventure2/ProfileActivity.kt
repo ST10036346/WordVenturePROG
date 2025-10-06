@@ -45,16 +45,14 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize StatsManager
+        // initialise StatsManager
         statsManager = StatsManager(this)
 
         // populate UI with user data
         displayUserProfile()
 
-        // ADDED: Load the selected profile picture from SharedPreferences
         loadProfilePicture()
 
-        // Display game statistics
         displayGameStats()
 
         // set up listeners for navigation and actions
@@ -70,15 +68,11 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     /**
-     * Loads the saved profile picture resource ID from SharedPreferences
-     * and displays it in the profilePicture ImageView.
+     * Loads the saved profile picture resource ID from SharedPreferences and displays it
      */
     private fun loadProfilePicture() {
-        // Get the saved resource ID using the static helper from ProfilePhotoActivity
-        // If nothing is saved, it returns the default image ID.
         val savedResId = getProfilePicResId(this)
 
-        // Set the image resource on the ImageView
         binding.profilePicture.setImageResource(savedResId)
     }
 
@@ -88,19 +82,19 @@ class ProfileActivity : AppCompatActivity() {
     private fun displayUserProfile() {
         val user = auth.currentUser
         if (user != null) {
-            // Display User Email (Read-only)
+            // display User Email (unable to edit)
             binding.emailEditText.setText(user.email ?: "Email not available")
             binding.emailEditText.isFocusable = false
             binding.emailEditText.isFocusableInTouchMode = false
 
-            // Display Username (Use existing display name or fallback)
+            // display Username (use existing display name)
             val username = user.displayName ?: user.email?.substringBefore('@') ?: "WordVenturePlayer"
             binding.usernameEditText.setText(username)
-            // Ensure username is editable
+            // username is editable
             binding.usernameEditText.isFocusable = true
             binding.usernameEditText.isFocusableInTouchMode = true
 
-            // Password field remains a placeholder for security (********)
+            // password field is a placeholder for security
             binding.passwordEditText.isFocusable = false
             binding.passwordEditText.isFocusableInTouchMode = false
         }
@@ -113,27 +107,31 @@ class ProfileActivity : AppCompatActivity() {
         val stats = statsManager.getStats()
 
         try {
-            // Update Basic Stats
+            // update stats
             binding.gamesPlayedValue.text = stats.gamesPlayed.toString()
             binding.winStreakValue.text = stats.winStreak.toString()
             binding.maxStreakValue.text = stats.maxStreak.toString()
 
-            // Update Graph
+            // update graph
             updateGuessDistributionGraph(stats.guessDistribution)
         } catch (e: Exception) {
             Log.e(TAG, "Error binding profile stats views: Ensure activity_profile.xml contains required TextViews.", e)
-            // Show a user-friendly error or skip updating these views
         }
     }
 
-    // NEW FUNCTION: Handles the bar graph drawing for the Profile Screen
+    // bar graph drawing for Profile Screen
+    /**
+     * GeeksforGeeks, 2021.
+     * How to Create a BarChart in Android?
+     * Available at: https://www.geeksforgeeks.org/android/how-to-create-a-barchart-in-android/
+     */
     private fun updateGuessDistributionGraph(guessDist: IntArray) {
         val chartContainer = binding.guessDistributionChartContainer
 
-        // Calculate the maximum count to determine bar scale
+        // calculate maximum count to determine bar scale
         val maxCount = guessDist.maxOrNull()?.coerceAtLeast(1) ?: 1 // Ensure maxCount is at least 1
 
-        chartContainer.removeAllViews() // Clear any old views
+        chartContainer.removeAllViews()
 
         for (i in 0 until guessDist.size) {
             val count = guessDist[i]
@@ -141,7 +139,7 @@ class ProfileActivity : AppCompatActivity() {
 
             val barWeight = if (count > 0) count.toFloat() / maxCount.toFloat() else 0.05f
 
-            // Create a row for the bar (Guess #: [Bar] Count)
+            // create a row for the bar
             val rowLayout = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -152,7 +150,7 @@ class ProfileActivity : AppCompatActivity() {
                 setPadding(0, 4, 0, 4)
             }
 
-            // 1. Guess Number Label
+            // guess number label
             val label = TextView(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -166,7 +164,7 @@ class ProfileActivity : AppCompatActivity() {
                 setTypeface(null, Typeface.BOLD)
             }
 
-            // 2. Bar Container
+            // bar container
             val barContainer = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     0,
@@ -178,20 +176,20 @@ class ProfileActivity : AppCompatActivity() {
                 setBackgroundColor(Color.TRANSPARENT)
             }
 
-            // The actual bar
+            // actual bar
             val bar = TextView(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     0,
-                    30, // Fixed height for the bar
+                    30, // fixed height
                     barWeight * 0.9f
                 ).apply {
                     marginEnd = 4
                 }
-                setBackgroundColor(Color.parseColor("#8058E5")) // Bar color
+                setBackgroundColor(Color.parseColor("#8058E5"))
                 text = ""
             }
 
-            // 3. Count Label
+            // count label
             val countLabel = TextView(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -213,35 +211,32 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     /**
-     * Sets up click listeners for the nav bar and profile actions.
+     * Set up click listeners for nav bar and profile actions.
      */
     private fun setListeners() {
-        // Back Icon navigates to the previous screen (typically Main Menu)
+        // navigates to previous screen
         binding.backIcon.setOnClickListener {
-            finish() // Standard back behavior
+            finish()
         }
 
-        // Settings Icon navigates to the Settings Page
+        // navigates to Settings Page
         binding.settingsIcon.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        // Logout button logs user out
+        // logout button
         binding.logoutButton.setOnClickListener {
             showLogoutConfirmationDialog()
         }
 
-        // --- PROFILE PHOTO NAVIGATION (NEW) ---
-        // Click on the profile photo card to navigate to the selection activity
+        // click on profile photo card to navigate to selection activity
         binding.profilePhotoCard.setOnClickListener {
             startActivity(Intent(this, ProfilePhotoActivity::class.java))
         }
 
-        // --- Username Save Listener ---
-        // Save the username when the EditText loses focus (user is done editing).
+        // save username when the EditText loses focus (when user is done editing)
         binding.usernameEditText.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
-                // If focus is lost, attempt to save the new username
                 updateUsername()
             }
         }
