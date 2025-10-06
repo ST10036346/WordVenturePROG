@@ -88,70 +88,28 @@
         android:layout_height="0dp"
         android:layout_marginTop="32dp"
         android:orientation="vertical"
+        android:gravity="center_horizontal"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
-        <!-- Dark Mode and Sound Toggles -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:backgroundTint="#9889CD"
-                android:layout_marginBottom="50dp"
-                android:layout_marginTop="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:textColor="#051646"
-                    android:padding="10dp">
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/darkModeSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        app:showText="false"
-                        app:thumbTint="#FFFFFF"
-                        app:trackTint="#6750A4" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="end"
-                        android:paddingEnd="16dp"
-                        android:text="Dark Mode"
-                        android:textColor="#051646"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/comic_relief" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
             <!-- Sound Card -->
             <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="50dp"
                 android:layout_weight="1"
                 android:backgroundTint="#9889CD"
-                android:layout_marginBottom="50dp"
-                android:layout_marginTop="20dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="4dp">
 
@@ -160,8 +118,8 @@
                     android:layout_height="40dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp">
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/soundSwitch"
@@ -176,10 +134,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:fontFamily="@font/comic_relief"
                         android:gravity="end"
                         android:paddingEnd="16dp"
                         android:text="Sound"
-                        android:fontFamily="@font/comic_relief"
                         android:textColor="#051646"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -189,8 +147,6 @@
 
         </LinearLayout>
 
-        <!-- Main Buttons -->
-        <!-- Edit Profile Button Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="270dp"
             android:layout_height="wrap_content"

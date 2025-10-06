@@ -23,7 +23,6 @@ class SettingsActivity : AppCompatActivity() {
 
     // SharedPreferences name for saving user preferences
     private val PREFS_NAME = "GameSettings"
-    private val KEY_DARK_MODE = "isDarkModeEnabled"
     private val KEY_SOUND = "isSoundEnabled"
 
     // SharedPreferences instance
@@ -51,15 +50,11 @@ class SettingsActivity : AppCompatActivity() {
      * Loads saved preferences and sets the initial state of the UI elements.
      */
     private fun setInitialState() {
-        val isDarkMode = prefs.getBoolean(KEY_DARK_MODE, false) // Default to light mode
         val isSound = prefs.getBoolean(KEY_SOUND, true) // Default to sound on
 
         // Use binding to access the switches
-        binding.darkModeSwitch.isChecked = isDarkMode
         binding.soundSwitch.isChecked = isSound
 
-        // Apply the theme immediately on creation if necessary
-        applyTheme(isDarkMode)
     }
 
     /**
@@ -79,16 +74,6 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // --- Settings Toggles (Using binding) ---
-
-        // Dark Mode Switch Listener
-        binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean(KEY_DARK_MODE, isChecked).apply()
-
-            applyTheme(isChecked)
-
-            val toastMessage = if (isChecked) "Dark Mode On" else "Dark Mode Off"
-            Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
-        }
 
         // 🟢 Sound Switch Listener: ADD CALL TO MUSIC SERVICE HERE
         binding.soundSwitch.setOnCheckedChangeListener { _, isChecked ->
