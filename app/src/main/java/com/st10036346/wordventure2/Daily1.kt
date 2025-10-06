@@ -12,6 +12,7 @@ import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout // ADDED: Required for dynamic chart drawing
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,9 @@ import java.util.Date
 import java.util.Locale
 import kotlin.jvm.java
 
+// ADDED IMPORTS for Stats Management:
+import com.st10036346.wordventure2.StatsManager
+
 class Daily1 : AppCompatActivity() {
 
     private lateinit var binding: ActivityDaily1Binding
@@ -35,9 +39,10 @@ class Daily1 : AppCompatActivity() {
     private val tiles = Array(rows) { arrayOfNulls<TextView>(cols) }
     private var currentRow = 0
     private var currentCol = 0
-    private var targetWord = "" // Will be fetched from API
+    private var targetWord = ""
 
-    // --- Keyboard State Management ---
+    private lateinit var statsManager: StatsManager
+
     private enum class LetterStatus {
         CORRECT, // Green
         PRESENT, // Yellow
@@ -52,21 +57,18 @@ class Daily1 : AppCompatActivity() {
         binding = ActivityDaily1Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        statsManager = StatsManager(this)
+
         isReplayMode = intent.getBooleanExtra("IS_REPLAY", false)
 
-        // --- CORRECTED SETUP LOGIC ---
-        // The if/else block now correctly handles all setup scenarios without duplication.
         if (isReplayMode) {
-            // SCENARIO 1: Replay a completed game
             loadAndReplayGame()
         } else {
-            // SCENARIO 2: Start a fresh game
             setupBoard()
             setupKeyboard()
-            binding.keyboardLayout.visibility = View.INVISIBLE // Hide keyboard until word is ready
+            binding.keyboardLayout.visibility = View.INVISIBLE
             fetchWordleWord()
         }
-        // The duplicate calls that were here have been removed.
 
         binding.profileIcon.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
@@ -79,7 +81,6 @@ class Daily1 : AppCompatActivity() {
         }
 
         binding.backIcon.setOnClickListener {
-            // Assuming this should go to MainMenu
             val intent = Intent(this, MainMenu::class.java)
             startActivity(intent)
             finish()
@@ -87,7 +88,6 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun setupBoard() {
-        // Clear previous views if any, to be safe
         binding.boardGrid.removeAllViews()
         val defaultTileBg = ContextCompat.getDrawable(this, R.drawable.tile_border)
         for (i in 0 until rows) {
@@ -123,13 +123,6 @@ class Daily1 : AppCompatActivity() {
         }
     }
 
-    // --- THIS IS THE FULLY UPDATED onEnterPressed FUNCTION ---
-    // In Daily1.kt
-
-    // --- THIS IS THE FULLY UPDATED onEnterPressed FUNCTION ---
-    // In Daily1.kt
-
-    // --- THIS IS THE FULLY UPDATED and STABILIZED onEnterPressed FUNCTION ---
     private fun onEnterPressed() {
         if (currentCol != cols) {
             Toast.makeText(this, "Not enough letters", Toast.LENGTH_SHORT).show()
@@ -138,43 +131,34 @@ class Daily1 : AppCompatActivity() {
 
         val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }.uppercase()
         val safeContext = this
-        val guessBody = WordGuess(guess) // Create the body object
-        // Disable UI to prevent multiple submissions
+        val guessBody = WordGuess(guess)
+
         binding.keyboardLayout.isEnabled = false
 
-        // Call the API to check if the word is valid
         RetrofitClient.instance.checkWord(guessBody).enqueue(object : Callback<CheckWordResponse> {
             override fun onResponse(call: Call<CheckWordResponse>, response: Response<CheckWordResponse>) {
-                // Check if the network call itself was successful (e.g., status 200 OK)
                 if (response.isSuccessful && response.body()?.valid == true) {
-                    // Word is VALID and response was successful
                     runOnUiThread {
                         proceedWithGuess(guess)
                     }
                 } else {
-                    // Word is INVALID or response was unsuccessful (e.g., 404)
-                    // Use a Handler to post the UI update safely.
                     Handler(Looper.getMainLooper()).postDelayed({
                         Toast.makeText(applicationContext, "Not in word list", Toast.LENGTH_SHORT).show()
-                        binding.keyboardLayout.isEnabled = true // Re-enable keyboard
-                    }, 50) // A small 50ms delay is enough to prevent the crash
+                        binding.keyboardLayout.isEnabled = true
+                    }, 50)
                 }
             }
 
             override fun onFailure(call: Call<CheckWordResponse>, t: Throwable) {
-                // This block runs for network errors (e.g., no internet)
                 android.util.Log.e("API_FAILURE", "Retrofit call failed", t)
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(safeContext, "Could not verify word", Toast.LENGTH_SHORT).show()
-                    binding.keyboardLayout.isEnabled = true // Re-enable keyboard
+                    binding.keyboardLayout.isEnabled = true
                 }
             }
         })
     }
 
-
-
-    // --- NEW HELPER FUNCTION TO CONTAIN LOGIC AFTER VALIDATION ---
     private fun proceedWithGuess(guess: String) {
         // 1. Color the grid row
         colorGridRow(guess, currentRow)
@@ -244,11 +228,28 @@ class Daily1 : AppCompatActivity() {
             statsTitle.text = "NEXT TIME!"
             Toast.makeText(this, "The word was: $targetWord", Toast.LENGTH_LONG).show()
         }
+
+        if (!isReplayMode) {
+            // 1. SAVE the stats (guesses is the current row + 1)
+            val guesses = currentRow + 1
+            statsManager.updateStats(didWin, if (didWin) guesses else 0)
+            saveCompletedGame(didWin) // Your existing function
+        }
+
+        // 2. FETCH the latest stats for display
+        val currentStats = statsManager.getStats()
+
+        // 3. DISPLAY the fetched stats in the panel
+        val stats = binding.statsPanel
+        stats.gamesPlayedValue.text = currentStats.gamesPlayed.toString()
+        stats.winStreakValue.text = currentStats.winStreak.toString()
+        stats.maxStreakValue.text = currentStats.maxStreak.toString()
+
+        // 4. Update the graph dynamically
+        updateStatsPanelGraph(stats.guessDistributionChartContainer, currentStats.guessDistribution)
+
         binding.statsPanelContainer.visibility = View.VISIBLE
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
-        if (!isReplayMode) {
-            saveCompletedGame(didWin)
-        }
     }
 
     private fun fetchWordleWord() {
@@ -321,7 +322,7 @@ class Daily1 : AppCompatActivity() {
 
         val savedRows = savedGridState.split(";")
         savedRows.forEachIndexed { i, rowString ->
-            if (i < rows) { // Check to prevent index out of bounds
+            if (i < rows) {
                 currentRow = i
                 val letters = rowString.split(",")
                 letters.forEachIndexed { j, letter ->
@@ -367,5 +368,84 @@ class Daily1 : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun updateStatsPanelGraph(container: LinearLayout, guessDist: IntArray) {
+        val BAR_HEIGHT_DP = 18
+        val TEXT_COLOR = Color.parseColor("#051646")
+
+        val maxCount = guessDist.maxOrNull()?.coerceAtLeast(1) ?: 1
+        container.removeAllViews()
+
+        for (i in 0 until guessDist.size.coerceAtMost(6)) {
+            val count = guessDist[i]
+            val guessNumber = i + 1
+
+            val barPercentage = count.toFloat() / maxCount.toFloat()
+            val barWeight = barPercentage * 0.7f
+
+            val rowLayout = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = 4.dpToPx()
+                }
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+
+            // 1. Guess Number Label (10% width)
+            val label = TextView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.1f)
+                text = guessNumber.toString()
+                textSize = 12f
+                setTextColor(TEXT_COLOR)
+                gravity = Gravity.CENTER_VERTICAL or Gravity.END
+                setTypeface(null, Typeface.BOLD)
+                setPadding(0, 0, 8, 0)
+            }
+            rowLayout.addView(label)
+
+            // 2. Bar Container (80% width)
+            val barContainer = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.8f)
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.START
+            }
+
+            // The actual bar (dynamic width)
+            val bar = View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, BAR_HEIGHT_DP.dpToPx(), barWeight.coerceAtLeast(0.01f))
+                setBackgroundColor(Color.parseColor("#8058E5"))
+            }
+            barContainer.addView(bar)
+
+            // Add a spacer to push the count label to the end
+            val spacer = View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, BAR_HEIGHT_DP.dpToPx(), (0.8f - barWeight).coerceAtLeast(0.01f))
+            }
+            barContainer.addView(spacer)
+
+
+            // 3. Count Label (10% width)
+            val countLabel = TextView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.1f)
+                text = count.toString()
+                textSize = 12f
+                setTextColor(TEXT_COLOR)
+                gravity = Gravity.CENTER_VERTICAL or Gravity.START
+                setTypeface(null, Typeface.BOLD)
+                setPadding(8, 0, 0, 0)
+            }
+
+            rowLayout.addView(barContainer)
+            rowLayout.addView(countLabel)
+
+            container.addView(rowLayout)
+        }
+    }
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 }
