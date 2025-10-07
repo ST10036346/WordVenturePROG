@@ -15,15 +15,13 @@ jobs:
     # Define the environment variables used by the Android SDK
     env:
       JAVA_VERSION: '17'
-      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+      # The problematic line for ANDROID_SDK_ROOT is removed here
 
     steps:
       - name: Checkout Repository
-        # Action to pull the repository code onto the runner
         uses: actions/checkout@v4
 
       - name: Set up Java
-        # Action to configure the correct Java version for Android development
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -35,16 +33,18 @@ jobs:
         with:
           gradle-version: wrapper
 
+      # --- NEW STEP TO FIX ANDROID SDK PATH ---
+      - name: Set ANDROID_SDK_ROOT Environment Variable
+        run: echo "ANDROID_SDK_ROOT=$HOME/Android/sdk" >> $GITHUB_ENV
+
       - name: Make Gradle Wrapper Executable
-        # Ensure the Gradle wrapper script has executable permissions
         run: chmod +x ./gradlew
 
       - name: Run Unit Tests
-        # Executes the 'testDebugUnitTest' task, which runs all tests in the app/src/test directory
+        # Executes the 'testDebugUnitTest' task, which runs all tests
         run: ./gradlew testDebugUnitTest
 
       - name: Publish Test Report (Optional)
-        # If any tests fail, this step uploads the failure reports for easy viewing
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -53,5 +53,4 @@ jobs:
           retention-days: 7
 
       - name: Build Debug APK (Optional - useful for checking build validity)
-        # Builds the application to ensure the project compiles successfully
         run: ./gradlew assembleDebug
