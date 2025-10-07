@@ -50,7 +50,13 @@ class StatsManager(context: Context, private val userId: String) {
      * @param didWin True if the game was won, False otherwise.
      * @param guesses The number of guesses taken (1-6) if won, or 0 if lost.
      */
+    // In StatsManager.kt, replace your function with this corrected version
+
     fun updateStats(didWin: Boolean, guesses: Int) {
+        // 1. Start a single editor transaction
+        val editor = prefs.edit()
+
+        // 2. Calculate all the new values
         val gamesPlayed = prefs.getInt(KEY_GAMES_PLAYED, 0) + 1
         var winStreak = prefs.getInt(KEY_WIN_STREAK, 0)
         var maxStreak = prefs.getInt(KEY_MAX_STREAK, 0)
@@ -61,21 +67,23 @@ class StatsManager(context: Context, private val userId: String) {
                 maxStreak = winStreak
             }
 
-            // Increment the count for the specific guess number (guesses is 1-6)
+            // Add the guess distribution change to our transaction
             if (guesses in 1..6) {
-                val index = guesses - 1 // Array index is 0-5
+                val index = guesses - 1
                 val currentCount = prefs.getInt(KEY_GUESS_DISTRIBUTION[index], 0)
-                prefs.edit().putInt(KEY_GUESS_DISTRIBUTION[index], currentCount + 1).apply()
+                editor.putInt(KEY_GUESS_DISTRIBUTION[index], currentCount + 1)
             }
         } else {
             winStreak = 0 // Reset win streak on a loss
         }
 
-        // Update basic stats
-        prefs.edit()
-            .putInt(KEY_GAMES_PLAYED, gamesPlayed)
-            .putInt(KEY_WIN_STREAK, winStreak)
-            .putInt(KEY_MAX_STREAK, maxStreak)
-            .apply()
+        // 3. Add all other changes to the same transaction
+        editor.putInt(KEY_GAMES_PLAYED, gamesPlayed)
+        editor.putInt(KEY_WIN_STREAK, winStreak)
+        editor.putInt(KEY_MAX_STREAK, maxStreak)
+
+        // 4. Apply all changes at once. This is atomic and safe.
+        editor.apply()
     }
+
 }

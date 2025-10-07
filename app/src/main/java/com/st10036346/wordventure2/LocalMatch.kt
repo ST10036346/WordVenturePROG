@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import android.os.Handler
 import android.os.Looper
+import android.widget.GridLayout
 import androidx.core.graphics.drawable.DrawableCompat
 import com.st10036346.wordventure2.databinding.ActivityLocalMatchBinding
 import kotlin.jvm.java
@@ -75,7 +76,7 @@ class LocalMatch : AppCompatActivity() {
         // -----------------------------------------------------------------
 
         setupBoard()
-        setupKeyboard() // Make sure this is called AFTER letterButtonMap might be needed
+       // Make sure this is called AFTER letterButtonMap might be needed
 
         // --- 2. Set the Initial Game State ---
         activePlayer = 1
@@ -83,7 +84,6 @@ class LocalMatch : AppCompatActivity() {
 
         // --- 3. Update the UI with the initial state ---
         updatePlayerIndicator() // This will now use the correct player name
-        binding.keyboardLayout.visibility = View.VISIBLE
 
         binding.profileIcon.setOnClickListener {
             // Create an Intent to start ProfileActivity
@@ -100,30 +100,65 @@ class LocalMatch : AppCompatActivity() {
 
         // You can also add one for the book icon to go home if you wish
         binding.bookIcon.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, MainMenu::class.java)
             startActivity(intent)
             finish() // Optional: finish Daily1 so the user can't go back to it
         }
     }
 
+    // In LocalMatch.kt, REPLACE your setupBoard function with this one.
+
+    // In LocalMatch.kt
+
+    // In LocalMatch.kt, REPLACE your entire setupBoard function
+
     private fun setupBoard() {
-        val defaultTileBg = ContextCompat.getDrawable(this, R.drawable.tile_border)
-        for (i in 0 until rows) {
-            for (j in 0 until cols) {
-                val tile = TextView(this).apply {
-                    layoutParams = android.widget.GridLayout.LayoutParams().apply {
-                        width = 230; height = 230; setMargins(2, 2, 2, 2)
+        binding.boardGrid.removeAllViews()
+        val marginSizeInPixels = resources.getDimensionPixelSize(R.dimen.tile_margin)
+
+        binding.keyboardLayout.visibility = View.INVISIBLE
+
+        binding.boardGrid.post {
+            val gridWidth = binding.boardGrid.width
+            val totalMarginSpace = (marginSizeInPixels * 2) * cols
+            val netWidthForTiles = gridWidth - totalMarginSpace
+            val tileSize = netWidthForTiles / cols
+
+            for (i in 0 until rows) {
+                for (j in 0 until cols) {
+                    val tile = TextView(this@LocalMatch).apply {
+                        // --- THIS IS THE FIX ---
+                        // Create row and column specs to define the tile's exact position.
+                        val rowSpec = GridLayout.spec(i)
+                        val colSpec = GridLayout.spec(j)
+
+                        // Apply the specs to the LayoutParams.
+                        layoutParams = GridLayout.LayoutParams(rowSpec, colSpec).apply {
+                            width = tileSize // Width is now controlled by the column spec's weight
+                            height = tileSize // Height is now controlled by the row spec's weight
+                            setMargins(marginSizeInPixels, marginSizeInPixels, marginSizeInPixels, marginSizeInPixels)
+                        }
+                        // --- END FIX ---
+
+                        setBackgroundResource(R.drawable.tile_border)
+                        gravity = Gravity.CENTER
+                        setTextColor(Color.BLACK)
+                        textSize = 32f
+                        isAllCaps = true
+                        typeface = Typeface.DEFAULT_BOLD
                     }
-                    gravity = Gravity.CENTER
-                    textSize = 32f
-                    setTypeface(null, Typeface.BOLD)
-                    background = defaultTileBg
+                    binding.boardGrid.addView(tile)
+                    tiles[i][j] = tile
                 }
-                binding.boardGrid.addView(tile)
-                tiles[i][j] = tile
             }
+
+            setupKeyboard()
+            binding.keyboardLayout.visibility = View.VISIBLE
         }
     }
+
+
+
 
     private fun onLetterPressed(letter: Char) {
         if (currentCol < cols) {
