@@ -3,7 +3,7 @@ package com.st10036346.wordventure2
 import android.content.Context
 import android.content.SharedPreferences
 
-// This data class holds all game statistics and should be outside the StatsManager class
+// This data class holds all game statistics
 data class GameStats(
     val gamesPlayed: Int,
     val winStreak: Int,
@@ -11,8 +11,13 @@ data class GameStats(
     val guessDistribution: IntArray
 )
 
-class StatsManager(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("WordVentureStats", Context.MODE_PRIVATE)
+// 💡 UPDATE: StatsManager now requires the unique userId in the constructor
+class StatsManager(context: Context, private val userId: String) {
+
+    // 💡 FIX: Use the userId in the SharedPreferences file name
+    // This creates a separate file for each user, making the stats user-specific.
+    private val PREFS_FILE_NAME = "WordVentureStats_$userId"
+    private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE)
 
     companion object {
         // Keys for basic stats

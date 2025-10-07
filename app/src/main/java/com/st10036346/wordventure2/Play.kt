@@ -19,24 +19,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 
-// 💡 CRITICAL FIX 1: Import the correct binding class for 'play_screen.xml'
-// The correct binding name is derived from your XML filename: play_screen -> PlayScreenBinding
-import com.st10036346.wordventure2.databinding.PlayScreenBinding // <--- NEW CORRECT BINDING IMPORT
-// import com.st10036346.wordventure2.databinding.ActivityDaily1Binding // <-- OLD, INCORRECT BINDING IMPORT (REMOVED)
+// Imports for Firebase Auth
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
+import com.st10036346.wordventure2.databinding.PlayScreenBinding // Correct Binding Import
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 import com.st10036346.wordventure2.StatsManager
 
 class Play : AppCompatActivity() {
 
-    // 💡 CRITICAL FIX 2: Change the binding type to the correct class
-    private lateinit var binding: PlayScreenBinding // <--- NEW CORRECT BINDING TYPE
+    private lateinit var binding: PlayScreenBinding
 
     private val rows = 6
     private val cols = 5
@@ -47,11 +46,17 @@ class Play : AppCompatActivity() {
 
     // --- LEVEL TRACKING ---
     private var currentLevelNumber: Int = 1
-    private val PREFS_NAME = "GameProgress"
+    // Base name for Level Progress file - we append the user ID to this.
+    private val BASE_PREFS_NAME = "GameProgress"
     private val KEY_UNLOCKED_LEVEL = "current_level_unlocked"
+    // Stores the user ID obtained in onCreate
+    private lateinit var currentUserId: String
     // ----------------------
 
     private lateinit var statsManager: StatsManager
+
+    // NEW PROPERTY: Required for Firebase Auth
+    private lateinit var auth: FirebaseAuth
 
     private enum class LetterStatus {
         CORRECT, // Green
@@ -65,36 +70,54 @@ class Play : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 💡 CRITICAL FIX 3: Inflate the correct layout binding
-        binding = PlayScreenBinding.inflate(layoutInflater) // <--- NEW CORRECT BINDING INFLATION
+        binding = PlayScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        statsManager = StatsManager(this)
+        // 1. Initialize Firebase Auth
+        auth = Firebase.auth
+
+        // 2. Get the user's UID
+        val userId = auth.currentUser?.uid
+
+        // 3. Safety check: Ensure user is logged in
+        if (userId == null) {
+            Toast.makeText(this, "Authentication error. Please log in again.", Toast.LENGTH_LONG).show()
+            val intent = Intent(this, Login::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
+        // Store the user ID globally for this activity
+        currentUserId = userId
+
+        // 4. FIX: Initialize StatsManager correctly with the unique user ID
+        // This was the error in the code you provided for Play.kt.
+        statsManager = StatsManager(this, currentUserId)
 
         // Get the level number passed from the Levels screen
         currentLevelNumber = intent.getIntExtra("LEVEL_NUMBER", 1)
         Toast.makeText(this, "Level $currentLevelNumber Loaded", Toast.LENGTH_SHORT).show()
 
 
-        // --- Always start a fresh game for Levels mode ---
+        // Starts fresh game for each level
         setupBoard()
         setupKeyboard()
-        binding.keyboardLayout.visibility = View.INVISIBLE // Assuming this ID exists in play_screen.xml
+        binding.keyboardLayout.visibility = View.INVISIBLE
         fetchWordleWord()
-        // -------------------------------------------------
 
-        binding.profileIcon.setOnClickListener { // Assuming this ID exists in play_screen.xml
+        binding.profileIcon.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
 
-        binding.settingsIcon.setOnClickListener { // Assuming this ID exists in play_screen.xml
+        binding.settingsIcon.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
         // Back icon goes back to the Levels screen for this mode
-        binding.backIcon.setOnClickListener { // Assuming this ID exists in play_screen.xml
+        binding.backIcon.setOnClickListener {
             val intent = Intent(this, Levels::class.java)
             startActivity(intent)
             finish()
@@ -102,10 +125,12 @@ class Play : AppCompatActivity() {
     }
 
     private fun saveLevelProgress(levelCompleted: Int) {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        // FIX: Append the currentUserId to the preference file name to save progress uniquely
+        val prefsNameWithId = "${BASE_PREFS_NAME}_${currentUserId}"
+        val prefs = getSharedPreferences(prefsNameWithId, Context.MODE_PRIVATE)
         val nextLevel = levelCompleted + 1
 
-        // Only save if the completed level is the one that unlocks the next one
+        // Only saves if the completed level is the one that unlocks the next one
         if (nextLevel > prefs.getInt(KEY_UNLOCKED_LEVEL, 1)) {
             prefs.edit().putInt(KEY_UNLOCKED_LEVEL, nextLevel).apply()
             Toast.makeText(this, "Level $levelCompleted complete! Level $nextLevel unlocked.", Toast.LENGTH_LONG).show()
@@ -113,7 +138,7 @@ class Play : AppCompatActivity() {
     }
 
     private fun setupBoard() {
-        binding.boardGrid.removeAllViews() // Assuming this ID exists in play_screen.xml
+        binding.boardGrid.removeAllViews()
         val defaultTileBg = ContextCompat.getDrawable(this, R.drawable.tile_border)
         for (i in 0 until rows) {
             for (j in 0 until cols) {
@@ -135,14 +160,14 @@ class Play : AppCompatActivity() {
     }
 
     private fun onLetterPressed(letter: Char) {
-        if (currentCol < cols && binding.keyboardLayout.isEnabled) { // Assuming this ID exists in play_screen.xml
+        if (currentCol < cols && binding.keyboardLayout.isEnabled) {
             tiles[currentRow][currentCol]?.text = letter.toString()
             currentCol++
         }
     }
 
     private fun onBackPressedCustom() {
-        if (currentCol > 0 && binding.keyboardLayout.isEnabled) { // Assuming this ID exists in play_screen.xml
+        if (currentCol > 0 && binding.keyboardLayout.isEnabled) {
             currentCol--
             tiles[currentRow][currentCol]?.text = ""
         }
@@ -158,37 +183,41 @@ class Play : AppCompatActivity() {
         val safeContext = this
         val guessBody = WordGuess(guess)
 
-        binding.keyboardLayout.isEnabled = false // Assuming this ID exists in play_screen.xml
+        binding.keyboardLayout.isEnabled = false
 
+        //API call to validate word
         RetrofitClient.instance.checkWord(guessBody).enqueue(object : Callback<CheckWordResponse> {
             override fun onResponse(call: Call<CheckWordResponse>, response: Response<CheckWordResponse>) {
                 if (response.isSuccessful && response.body()?.valid == true) {
+                    //Word is valid
                     runOnUiThread {
                         proceedWithGuess(guess)
                     }
                 } else {
+                    //Word is not in the dictionary
                     Handler(Looper.getMainLooper()).postDelayed({
                         Toast.makeText(applicationContext, "Not in word list", Toast.LENGTH_SHORT).show()
-                        binding.keyboardLayout.isEnabled = true // Assuming this ID exists in play_screen.xml
+                        binding.keyboardLayout.isEnabled = true
                     }, 50)
                 }
             }
 
             override fun onFailure(call: Call<CheckWordResponse>, t: Throwable) {
+                // Network error has occured
                 android.util.Log.e("API_FAILURE", "Retrofit call failed", t)
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(safeContext, "Could not verify word", Toast.LENGTH_SHORT).show()
-                    binding.keyboardLayout.isEnabled = true // Assuming this ID exists in play_screen.xml
+                    binding.keyboardLayout.isEnabled = true
                 }
             }
         })
     }
 
     private fun proceedWithGuess(guess: String) {
-        // 1. Color the grid row
+        // Color the grid row
         colorGridRow(guess, currentRow)
 
-        // 2. Update keyboard colors
+        // Update keyboard colors
         for (j in 0 until cols) {
             val letter = guess[j]
             if (letter == targetWord[j]) {
@@ -205,42 +234,41 @@ class Play : AppCompatActivity() {
         }
         updateKeyboardAppearance()
 
-        // 3. Check for a win
+        // Check for a win
         if (guess.equals(targetWord, ignoreCase = true)) {
-            binding.keyboardLayout.isEnabled = false // Assuming this ID exists in play_screen.xml
+            binding.keyboardLayout.isEnabled = false
 
-            // --- LEVEL PROGRESS SAVE ON WIN ---
+            // Level progress after a win
             saveLevelProgress(currentLevelNumber)
-            // ----------------------------------
 
             Handler(Looper.getMainLooper()).postDelayed({
-                showStatsPanel(didWin = true) // Show win panel
+                showStatsPanel(didWin = true) // Shows win panel
             }, 1000)
             return
         }
 
-        // 4. Move to the next row or end the game if it's a loss
+        // Moves to the next row or end the game if it's a loss
         currentRow++
         currentCol = 0
 
         if (currentRow >= rows) {
-            binding.keyboardLayout.isEnabled = false // Assuming this ID exists in play_screen.xml
+            binding.keyboardLayout.isEnabled = false
             Handler(Looper.getMainLooper()).postDelayed({
-                showStatsPanel(didWin = false) // Show loss panel
+                showStatsPanel(didWin = false) // Shows loss panel
             }, 1000)
         } else {
-            // Re-enable keyboard for the next turn if the game is not over
-            binding.keyboardLayout.isEnabled = true // Assuming this ID exists in play_screen.xml
+            // Re-enables keyboard for the next turn if the game is not over
+            binding.keyboardLayout.isEnabled = true
         }
     }
 
     private fun updateKeyboardAppearance() {
         for ((char, button) in letterButtonMap) {
             val status = keyboardLetterStatus[char] ?: continue
-            val color = when (status) {
-                LetterStatus.CORRECT -> Color.parseColor("#6AAA64")
-                LetterStatus.PRESENT -> Color.parseColor("#C9B458")
-                LetterStatus.ABSENT -> Color.parseColor("#787C7E")
+            val color = when (status) { // Determine colour based on status
+                LetterStatus.CORRECT -> Color.parseColor("#6AAA64") //Green
+                LetterStatus.PRESENT -> Color.parseColor("#C9B458") //Yellow
+                LetterStatus.ABSENT -> Color.parseColor("#787C7E") //Grey
             }
             val drawable = button.background
             DrawableCompat.setTint(drawable, color)
@@ -249,36 +277,28 @@ class Play : AppCompatActivity() {
     }
 
     private fun showStatsPanel(didWin: Boolean) {
-        binding.keyboardLayout.visibility = View.GONE // Assuming this ID exists in play_screen.xml
-        binding.statsPanel.statsTitle // Assuming statsPanel is an <include> in play_screen.xml
+        binding.keyboardLayout.visibility = View.GONE
 
+        // 1. Set the Title
         if (didWin) {
-            binding.statsPanel.statsTitle.text = "LEVEL $currentLevelNumber COMPLETED!"
+            binding.statsPanel.statsTitle.text = "LEVEL $currentLevelNumber COMPLETED!" //Stats panel for a win
         } else {
-            binding.statsPanel.statsTitle.text = "LEVEL FAILED! RETRY $currentLevelNumber"
+            binding.statsPanel.statsTitle.text = "LEVEL FAILED! RETRY $currentLevelNumber" //Stats panel for a loss
             Toast.makeText(this, "The word was: $targetWord", Toast.LENGTH_LONG).show()
         }
 
-        // --- CORRECTED CODE FOR HIDING STATS (Used for Levels) ---
-
-        // 1. Hide the horizontal container holding the 3 main metrics
+        // 2. HIDE ALL STATS ELEMENTS (as requested)
         binding.statsPanel.statsMetricsContainer.visibility = View.GONE
-
-        // 2. Hide the "Guess Distribution" label
         binding.statsPanel.guessDistributionLabel.visibility = View.GONE
-
-        // 3. Hide the chart container
         binding.statsPanel.guessDistributionChartContainer.visibility = View.GONE
-        // ---------------------------------------
 
-        // Change button text for Levels mode
+        // 3. Set the Button Text
         binding.statsPanel.playMoreButton.text = if (didWin) "PLAY NEXT LEVEL" else "RETRY LEVEL"
-        // Note: Using mainMenuButton based on your XML ID
         binding.statsPanel.mainMenuButton.text = "BACK TO LEVELS MENU"
 
-        // Button Listeners
+        // 4. Set Button Listeners
         binding.statsPanel.playMoreButton.setOnClickListener {
-            // If win, go to next level. If loss, retry current level.
+            // If you win, you go to the next level. If you lose, retry the current level
             val nextLevel = if (didWin) currentLevelNumber + 1 else currentLevelNumber
             val intent = Intent(this, Play::class.java).apply {
                 putExtra("LEVEL_NUMBER", nextLevel)
@@ -288,42 +308,44 @@ class Play : AppCompatActivity() {
         }
 
         binding.statsPanel.mainMenuButton.setOnClickListener {
-            val intent = Intent(this, Levels::class.java)
+            val intent = Intent(this, Levels::class.java) //Navigates to Levels menu
             startActivity(intent)
             finish()
         }
 
-        // Stat updates
-        val guesses = currentRow + 1
-        statsManager.updateStats(didWin, if (didWin) guesses else 0)
+        // 5. Stat updates (Still track in background)
+        val guesses = currentRow + 1 //SHows the guesses made
+        statsManager.updateStats(didWin, if (didWin) guesses else 0) //Updates overall user stats
 
 
-        binding.statsPanelContainer.visibility = View.VISIBLE // Assuming this ID exists in play_screen.xml
-        binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start() // Assuming this ID exists in play_screen.xml
+        // 6. Show the Panel
+        binding.statsPanelContainer.visibility = View.VISIBLE //Makes stats panel visible
+        binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
     }
 
+    //Fetches random word from API
     private fun fetchWordleWord() {
         RetrofitClient.instance.getRandomWord().enqueue(object : Callback<WordResponse> {
             override fun onResponse(call: Call<WordResponse>, response: Response<WordResponse>) {
                 if (response.isSuccessful) {
                     targetWord = response.body()?.word?.uppercase() ?: "APPLE"
-                    binding.keyboardLayout.visibility = View.VISIBLE // Assuming this ID exists in play_screen.xml
+                    binding.keyboardLayout.visibility = View.VISIBLE //Shows keyboard once the word has loaded for the game
                 } else {
-                    targetWord = "ERROR"
+                    targetWord = "ERROR" //Fallback word if API is unsuccessful
                     Toast.makeText(this@Play, "Failed to get a word.", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onFailure(call: Call<WordResponse>, t: Throwable) {
                 targetWord = "LOCAL" // Fallback for network failure
-                binding.keyboardLayout.visibility = View.VISIBLE // Assuming this ID exists in play_screen.xml
+                binding.keyboardLayout.visibility = View.VISIBLE
                 Toast.makeText(this@Play, "Network Error. Using default word.", Toast.LENGTH_LONG).show()
             }
         })
     }
 
+    //Keyboard setup
     private fun setupKeyboard() {
-        // Assuming all these button IDs (buttonQ, buttonW, etc.) exist in play_screen.xml
         letterButtonMap = mapOf(
             'Q' to binding.buttonQ, 'W' to binding.buttonW, 'E' to binding.buttonE,
             'R' to binding.buttonR, 'T' to binding.buttonT, 'Y' to binding.buttonY,
@@ -342,8 +364,9 @@ class Play : AppCompatActivity() {
 
     private fun colorGridRow(guess: String, row: Int) {
         val availableTargetLetters = targetWord.toMutableList()
-        val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Default Gray
+        val tileColors = Array(cols) { Color.parseColor("#787C7E") } // Grey
 
+        //Checks for correct letter and shows Green
         for (j in 0 until cols) {
             if (guess.length > j && targetWord.length > j && guess[j] == targetWord[j]) {
                 tileColors[j] = Color.parseColor("#6AAA64") // Green
@@ -351,7 +374,8 @@ class Play : AppCompatActivity() {
             }
         }
         for (j in 0 until cols) {
-            if (tileColors[j] != Color.parseColor("#6AAA64")) {
+            //If the tile was not Green, it checks for Yellow
+            if (tileColors[j] != Color.parseColor("#6AAA64"))  {
                 if (guess.length > j && availableTargetLetters.contains(guess[j])) {
                     tileColors[j] = Color.parseColor("#C9B458") // Yellow
                     val index = availableTargetLetters.indexOf(guess[j])
@@ -361,6 +385,7 @@ class Play : AppCompatActivity() {
                 }
             }
         }
+        //Applies colour to the tiles
         for (j in 0 until cols) {
             if (row < rows && j < cols) {
                 tiles[row][j]?.apply {
@@ -378,13 +403,16 @@ class Play : AppCompatActivity() {
         val maxCount = guessDist.maxOrNull()?.coerceAtLeast(1) ?: 1
         container.removeAllViews()
 
+        //Iteration for 6 possible guesses
         for (i in 0 until guessDist.size.coerceAtMost(6)) {
             val count = guessDist[i]
             val guessNumber = i + 1
 
+            //Calculate bar length ratio
             val barPercentage = count.toFloat() / maxCount.toFloat()
             val barWeight = barPercentage * 0.7f
 
+            //Layout for the entire row
             val rowLayout = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -396,7 +424,7 @@ class Play : AppCompatActivity() {
                 gravity = Gravity.CENTER_VERTICAL
             }
 
-            // 1. Guess Number Label (10% width)
+            // Guess Number Label
             val label = TextView(this).apply {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.1f)
                 text = guessNumber.toString()
@@ -408,28 +436,27 @@ class Play : AppCompatActivity() {
             }
             rowLayout.addView(label)
 
-            // 2. Bar Container (80% width)
+            // Bar Container
             val barContainer = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.8f)
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.START
             }
 
-            // The actual bar (dynamic width)
+            // Actual coloured bar
             val bar = View(this).apply {
                 layoutParams = LinearLayout.LayoutParams(0, BAR_HEIGHT_DP.dpToPx(), barWeight.coerceAtLeast(0.01f))
                 setBackgroundColor(Color.parseColor("#8058E5"))
             }
             barContainer.addView(bar)
 
-            // Add a spacer to push the count label to the end
             val spacer = View(this).apply {
                 layoutParams = LinearLayout.LayoutParams(0, BAR_HEIGHT_DP.dpToPx(), (0.8f - barWeight).coerceAtLeast(0.01f))
             }
             barContainer.addView(spacer)
 
 
-            // 3. Count Label (10% width)
+            //Count Label
             val countLabel = TextView(this).apply {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.1f)
                 text = count.toString()

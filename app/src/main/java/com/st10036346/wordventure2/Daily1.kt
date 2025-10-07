@@ -43,6 +43,8 @@ class Daily1 : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var statsManager: StatsManager
+    // Variable to hold the non-null user ID
+    private lateinit var currentUserId: String
 
     // Game State
     private val rows = 6
@@ -68,14 +70,20 @@ class Daily1 : AppCompatActivity() {
         // --- Initialization ---
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
-        statsManager = StatsManager(this)
 
         // Redirect to main menu if no user is logged in
-        if (auth.currentUser == null) {
+        val user = auth.currentUser
+        if (user == null) {
             startActivity(Intent(this, MainMenu::class.java))
             finish()
             return
         }
+
+        // 💡 FIX 1: Retrieve the user ID
+        currentUserId = user.uid
+
+        // 💡 FIX 2: Initialize StatsManager correctly with the user ID
+        statsManager = StatsManager(this, currentUserId)
 
         // --- Main Game Flow ---
         checkIfPlayedTodayAndFetchWord()
@@ -88,7 +96,8 @@ class Daily1 : AppCompatActivity() {
 
     // --- Core Logic: Step 1 - Check local state first ---
     private fun checkIfPlayedTodayAndFetchWord() {
-        val userId = auth.currentUser!!.uid
+        // Use the new class property for the user ID
+        val userId = currentUserId
         val prefs = getSharedPreferences("DailyChallenge_$userId", Context.MODE_PRIVATE)
         val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
@@ -136,7 +145,6 @@ class Daily1 : AppCompatActivity() {
     }
 
     // --- Core Logic: Step 3 - Generate word if it doesn't exist for today ---
-    // --- Core Logic: Step 3 - Generate word if it doesn't exist for today ---
     private suspend fun generateAndSetNewDailyWord(dateStr: String) {
         // This is a 'suspend' function, meaning it can be paused without blocking a thread.
         // It runs entirely on the background thread (Dispatchers.IO) from where it was called.
@@ -179,14 +187,6 @@ class Daily1 : AppCompatActivity() {
         }
     }
 
-    // You can now REMOVE the old fetchUniqueWordFromApi function as it's no longer used.
-    /*
-    private fun fetchUniqueWordFromApi(...) { ... }
-    */
-
-
-    // --- Helper to get a unique word from your API ---
-
     private fun finishGameSetup() {
         if (targetWord.length == 5) {
             isGameReady = true
@@ -205,9 +205,6 @@ class Daily1 : AppCompatActivity() {
 
     private fun setupBoard() {
         binding.boardGrid.removeAllViews()
-
-        // --- THIS IS THE FINAL FIX ---
-        // A precise calculation using dimensions defined in dp.
 
         // 1. Get the margin value in pixels from dimens.xml.
         val marginSizeInPixels = resources.getDimensionPixelSize(R.dimen.tile_margin)
@@ -255,10 +252,6 @@ class Daily1 : AppCompatActivity() {
         }
     }
 
-
-
-
-
     private fun setupKeyboard() {
         letterButtonMap = mapOf(
             'Q' to binding.buttonQ, 'W' to binding.buttonW, 'E' to binding.buttonE, 'R' to binding.buttonR, 'T' to binding.buttonT, 'Y' to binding.buttonY,
@@ -273,9 +266,7 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun onLetterPressed(letter: Char) {
-        // --- ADD THIS LINE ---
         if (!isGameReady) return
-        // -------------------
 
         if (currentCol < cols && binding.keyboardLayout.isEnabled) {
             tiles[currentRow][currentCol]?.text = letter.toString()
@@ -284,10 +275,8 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun onBackPressedCustom() {
-        if (!isGameReady) return // Add this safety check
+        if (!isGameReady) return
 
-        // --- THIS IS THE TYPO FIX ---
-        // It should be 'currentCol', not 'currentcol'
         if (currentCol > 0 && binding.keyboardLayout.isEnabled) {
             currentCol--
             tiles[currentRow][currentCol]?.text = ""
@@ -341,9 +330,6 @@ class Daily1 : AppCompatActivity() {
             binding.keyboardLayout.isEnabled = true
         }
     }
-
-    // (Your existing functions for colorGridRow, updateKeyboardAppearance, showStatsPanel, etc. go here)
-    // The following are copied from your file for completeness.
 
     private fun updateKeyboardLetterStatus(guess: String) {
         for (j in 0 until cols) {
@@ -408,7 +394,7 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun saveCompletedGame(didWin: Boolean) {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = currentUserId // Use the class property
         val prefsName = "DailyChallenge_$userId"
         val prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
         val editor = prefs.edit()
@@ -424,7 +410,7 @@ class Daily1 : AppCompatActivity() {
     }
 
     private fun loadAndReplayGame() {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = currentUserId // Use the class property
         val prefsName = "DailyChallenge_$userId"
         val prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
 
