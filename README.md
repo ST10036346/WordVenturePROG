@@ -116,6 +116,7 @@ This integration streamlined development and ensured consistent quality across t
 ## API Integration
 WordVenture connects to a custom Node.js backend API for dynamic content:
 | Endpoint |	Method |	Description |
+|----------|---------|--------------|
 | /daily-word |	GET |	Fetches the daily 5-letter word |
 | /guess |	POST |	Validates a user’s guess |
 
