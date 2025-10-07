@@ -1,0 +1,57 @@
+name: Android CI (Unit Tests)
+
+on:
+  # Triggers the workflow on push or pull request events for the main and develop branches
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  unit_test:
+    # Use a standard Linux runner environment
+    runs-on: ubuntu-latest
+
+    # Define the environment variables used by the Android SDK
+    env:
+      JAVA_VERSION: '17'
+      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+
+    steps:
+      - name: Checkout Repository
+        # Action to pull the repository code onto the runner
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        # Action to configure the correct Java version for Android development
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle Cache
+        # Action to cache Gradle dependencies, speeding up subsequent builds
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
+
+      - name: Make Gradle Wrapper Executable
+        # Ensure the Gradle wrapper script has executable permissions
+        run: chmod +x ./gradlew
+
+      - name: Run Unit Tests
+        # Executes the 'testDebugUnitTest' task, which runs all tests in the app/src/test directory
+        run: ./gradlew testDebugUnitTest
+
+      - name: Publish Test Report (Optional)
+        # If any tests fail, this step uploads the failure reports for easy viewing
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: app/build/reports/tests/debug/
+          retention-days: 7
+
+      - name: Build Debug APK (Optional - useful for checking build validity)
+        # Builds the application to ensure the project compiles successfully
+        run: ./gradlew assembleDebug
