@@ -17,23 +17,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // --- MUSIC INITIALIZATION LOGIC ---
 
-        // 1. Initialize SharedPreferences
         val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-        // 2. Retrieve the saved sound state. Default is 'true' (Sound ON).
+        // Retrieves the saved sound state. Default is the sound on
         val isSoundEnabled = prefs.getBoolean(KEY_SOUND, true)
 
-        // 3. Set the initial volume of the BackgroundMusicService
-        // If sound is enabled (true), Muted must be false. Hence, use !isSoundEnabled.
+        // Sets the initial volume of the BackgroundMusicService
         BackgroundMusicService.setVolume(!isSoundEnabled)
 
-        // 4. Create and Start the service.
+        // Create and Start the service.
         val musicIntent = Intent(this, BackgroundMusicService::class.java)
         startService(musicIntent)
 
-        // --- END MUSIC INITIALIZATION LOGIC ---
 
 
         val registerButton: Button = findViewById(R.id.register_button)
@@ -50,3 +46,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+/**
+ * GeeksforGeeks, 2025.
+ * How to Build a Wordle Game in Android?
+ * Available at: https://www.geeksforgeeks.org/android/how-to-build-a-wordle-game-application-in-android/
+ */

@@ -29,7 +29,7 @@ class MainMenu : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        // --- User login check ---
+        // User login check
         if (auth.currentUser == null) {
             Log.e(TAG, "User is not logged in. Redirecting to Login.")
             Toast.makeText(this, "Session expired, please log in again.", Toast.LENGTH_LONG).show()
@@ -49,9 +49,8 @@ class MainMenu : AppCompatActivity() {
         val profileIcon: ImageView = findViewById(R.id.profileIcon)
         val settingsIcon: ImageView = findViewById(R.id.settingsIcon)
 
-        // --- Daily Button Click Listener (Launches Daily1) ---
+        // Launches Daily game mode
         dailyButton.setOnClickListener {
-            // Access SharedPreferences to check the last play date
             val prefs = getSharedPreferences("DailyChallenge", Context.MODE_PRIVATE)
             val lastPlayDate = prefs.getString("lastPlayDate", null)
             val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -62,23 +61,20 @@ class MainMenu : AppCompatActivity() {
 
             // Compare dates to decide which mode to launch
             if (lastPlayDate == today) {
-                // The user has already played today, launch in replay mode
                 Log.d(TAG, "Launching Daily1 in replay mode.")
                 intent.putExtra("IS_REPLAY", true)
             } else {
-                // It's a new day or the first time playing, launch in normal mode
                 Log.d(TAG, "Launching Daily1 in normal play mode.")
                 intent.putExtra("IS_REPLAY", false)
             }
             startActivity(intent)
         }
 
-        // --- UPDATED: Play Button Click Listener (Launches Levels) ---
+        // Launches Levels game mode
         playButton.setOnClickListener {
             Log.d(TAG, "Play button clicked. Navigating to Levels screen.")
 
             // Direct the player to the Levels activity
-            // 💡 IMPORTANT: Ensure 'LevelsActivity' is the correct class name for your Levels screen.
             val intent = Intent(this, Levels::class.java)
 
             startActivity(intent)

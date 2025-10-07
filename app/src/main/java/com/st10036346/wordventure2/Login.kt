@@ -23,6 +23,12 @@ import com.google.firebase.ktx.Firebase
 class Login : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+
+    /**
+     * TECH_WORLD, 2023.
+     * SIGN IN WITH GOOGLE || FIREBASE ||ANDROID STUDIO KOTLIN TUTORIAL || STEP-BY-STEP IMPLEMENTATION
+     * Available at: https://www.youtube.com/watch?v=H_maapn4Q3Q
+     */
     private lateinit var googleSignInClient: GoogleSignInClient // Client for Google Sign-In
 
     companion object {
@@ -34,7 +40,7 @@ class Login : AppCompatActivity() {
             val intent = result.data
             val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
             try {
-                // Google Sign In was successful, authenticate with Firebase
+                // if Google Sign In was successful, this authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
                 Log.d(TAG, "Google sign-in success: id=${account.id}")
                 // Use the ID token to authenticate with Firebase
@@ -111,7 +117,7 @@ class Login : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, navigate to MainMenu
+                    // Login success navigates to Main Menu
                     Log.d(TAG, "Firebase Google Auth successful")
                     handleSuccessfulLogin()
                 } else {
