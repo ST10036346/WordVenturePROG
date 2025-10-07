@@ -1,3 +1,13 @@
+/*
+ * Author: Ethan Pillay
+ * Source: GeeksforGeeks - "How to Build a Wordle Game Application in Android"
+ * URL: https://www.geeksforgeeks.org/android/how-to-build-a-wordle-game-application-in-android/
+ * Description: Handles the daily single-player game mode. Manages the UI for daily puzzles,
+ *              player interactions, navigation to profile/settings/main menu, and launching
+ *              the gameplay activity.
+ */
+
+
 package com.st10036346.wordventure2
 
 import android.content.Context
