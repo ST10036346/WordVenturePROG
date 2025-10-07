@@ -23,6 +23,8 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var statsManager: StatsManager
+    // NEW PROPERTY: To hold the authenticated user's ID
+    private lateinit var currentUserId: String
 
     companion object {
         private const val TAG = "ProfileActivity"
@@ -34,19 +36,24 @@ class ProfileActivity : AppCompatActivity() {
         // initialise Firebase Auth
         auth = Firebase.auth
 
+        val user = auth.currentUser
+
         // check if user is logged in
-        if (auth.currentUser == null) {
+        if (user == null) {
             Log.e(TAG, "User not authenticated. Redirecting to Login.")
             redirectToLogin()
             return
         }
 
+        // FIX: Store the current user's ID
+        currentUserId = user.uid
+
         // initialise View Binding
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // initialise StatsManager
-        statsManager = StatsManager(this)
+        // FIX: initialise StatsManager, passing the required userId
+        statsManager = StatsManager(this, currentUserId)
 
         // populate UI with user data
         displayUserProfile()
