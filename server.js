@@ -1,28 +1,36 @@
+// server.js
+// Author: Ethan Pillay
+// Description: Simple Word API for Wordle-style game
+// Source/Attribution: Custom code, adapted concepts from Express and Node.js documentation
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000; // ✅ use Render's assigned port
+const PORT = process.env.PORT || 3000; // Use Render's assigned port
 
-// ✅ Enable CORS (so Android Studio or Postman can access the API)
+// Enable CORS so external apps (like Android Studio or Postman) can access the API
 app.use(cors());
 app.use(express.json());
 
-// ✅ Load words once on startup
+// Load words once at startup
+// Source for words: public domain word list (words.txt)
 const words = fs.readFileSync(path.join(__dirname, "words.txt"), "utf-8")
   .split("\n")
   .map(w => w.trim().toLowerCase())
   .filter(Boolean);
 
-// ✅ Endpoint: get a random word
+// GET /random-word
+// Returns a random word from the list
 app.get("/random-word", (req, res) => {
   const randomWord = words[Math.floor(Math.random() * words.length)];
   res.json({ word: randomWord });
 });
 
-// ✅ Endpoint: check if a word is valid
+// POST /check-word
+// Checks if the provided word exists in the list
 app.post("/check-word", (req, res) => {
   const { guess } = req.body;
 
@@ -34,11 +42,13 @@ app.post("/check-word", (req, res) => {
   res.json({ valid: isValid });
 });
 
-// ✅ Simple home route for testing
+// GET /
+// Simple home route for testing
 app.get("/", (req, res) => {
-  res.send("✅ Word API is running and ready!");
+  res.send(" Word API is running and ready!");
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
