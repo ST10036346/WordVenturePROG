@@ -46,7 +46,7 @@ class Play : AppCompatActivity() {
 
     // --- LEVEL TRACKING ---
     private var currentLevelNumber: Int = 1
-    // Base name for Level Progress file - we append the user ID to this.
+    // Standardized base name for Level Progress file
     private val BASE_PREFS_NAME = "GameProgress"
     private val KEY_UNLOCKED_LEVEL = "current_level_unlocked"
     // Stores the user ID obtained in onCreate
@@ -54,8 +54,6 @@ class Play : AppCompatActivity() {
     // ----------------------
 
     private lateinit var statsManager: StatsManager
-
-    // NEW PROPERTY: Required for Firebase Auth
     private lateinit var auth: FirebaseAuth
 
     private enum class LetterStatus {
@@ -92,7 +90,6 @@ class Play : AppCompatActivity() {
         currentUserId = userId
 
         // 4. FIX: Initialize StatsManager correctly with the unique user ID
-        // This was the error in the code you provided for Play.kt.
         statsManager = StatsManager(this, currentUserId)
 
         // Get the level number passed from the Levels screen

@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import com.google.firebase.auth.FirebaseAuth // ADDED: Firebase Auth import
 import com.st10036346.wordventure2.R
 import com.st10036346.wordventure2.databinding.ActivityLevelsBinding
 
@@ -19,15 +20,33 @@ class Levels : AppCompatActivity() {
 
     private lateinit var binding: ActivityLevelsBinding
 
-    // Levels are now unlimited (limited only by the word file size)
+    // Shared preference keys
+    private val BASE_PREFS_NAME = "GameProgress" // Renamed for consistency
+    private val KEY_UNLOCKED_LEVEL = "current_level_unlocked"
+
+    // NEW: Authentication properties
+    private lateinit var auth: FirebaseAuth
+    private lateinit var currentUserId: String
+
     private val MAX_DISPLAY_LEVEL = 9999 // Effectively unlimited cap for safety
 
-    // Shared preference keys
-    private val PREFS_NAME = "GameProgress"
-    private val KEY_UNLOCKED_LEVEL = "current_level_unlocked"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 1. Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
+
+        // 2. Check and assign user ID
+        val user = auth.currentUser
+        if (user == null) {
+            Toast.makeText(this, "Please log in to see levels.", Toast.LENGTH_LONG).show()
+            // Assuming 'Login' is your login activity
+            startActivity(Intent(this, Login::class.java))
+            finish()
+            return
+        }
+        currentUserId = user.uid // Store the authenticated user ID
 
         binding = ActivityLevelsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -51,7 +70,9 @@ class Levels : AppCompatActivity() {
     }
 
     private fun getCurrentUnlockedLevel(): Int {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        // FIX: Access the preference file using the user ID
+        val prefsNameWithId = "${BASE_PREFS_NAME}_${currentUserId}"
+        val prefs = getSharedPreferences(prefsNameWithId, Context.MODE_PRIVATE)
         // Default to 1 (Level 1 is always unlocked)
         return prefs.getInt(KEY_UNLOCKED_LEVEL, 1)
     }
@@ -160,7 +181,6 @@ class Levels : AppCompatActivity() {
     private fun startLevel(levelNum: Int) {
         Toast.makeText(this, "Starting Level $levelNum...", Toast.LENGTH_SHORT).show()
 
-        // --- FIXED: Change the target activity from Daily1 to Play ---
         val intent = Intent(this, Play::class.java).apply {
             // Pass the level number to the game activity
             putExtra("LEVEL_NUMBER", levelNum)
