@@ -87,21 +87,135 @@ class Daily1 : AppCompatActivity() {
     }
 
     // --- Core Logic: Step 1 - Check local state first ---
+    // In Daily1.kt
+
     private fun checkIfPlayedTodayAndFetchWord() {
         val userId = auth.currentUser!!.uid
         val prefs = getSharedPreferences("DailyChallenge_$userId", Context.MODE_PRIVATE)
         val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val lastPlayDate = prefs.getString("lastPlayDate", "")
 
-        if (prefs.getString("lastPlayDate", "") == todayStr) {
-            // User has already played today, load their completed game from local storage
+        // Check for a saved in-progress game from today
+        val hasSavedState = prefs.getBoolean("hasSavedState", false)
+
+        if (lastPlayDate == todayStr && !hasSavedState) {
+            // Condition 1: User has already FINISHED their game today.
             isReplayMode = true
             loadAndReplayGame()
+        } else if (lastPlayDate == todayStr && hasSavedState) {
+            // Condition 2: User has an IN-PROGRESS game from today.
+            isReplayMode = false
+            loadInProgressGame() // We will create this function next.
         } else {
-            // User has NOT played today. Fetch the official daily word from Firestore.
+            // Condition 3: User has not played at all today.
             isReplayMode = false
             fetchDailyWordFromFirestore(todayStr)
         }
     }
+    // In Daily1.kt
+
+    override fun onPause() {
+        super.onPause()
+        // Save progress only if the game is ready and not in replay mode.
+        if (isGameReady && !isReplayMode) {
+            saveCurrentProgress()
+        }
+    }
+// In Daily1.kt
+
+    private fun saveCurrentProgress() {
+        val userId = auth.currentUser!!.uid
+        val prefs = getSharedPreferences("DailyChallenge_$userId", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+
+        // Save grid state: e.g., "A,U,D,I,O;S,L,A,T,E;,,,,;"
+        val gridState = (0 until rows).joinToString(";") { i ->
+            (0 until cols).joinToString(",") { j ->
+                tiles[i][j]?.text?.toString() ?: ""
+            }
+        }
+
+        // Save keyboard state: e.g., "A:ABSENT;U:PRESENT;D:CORRECT;"
+        val keyboardState = keyboardLetterStatus.map { "${it.key}:${it.value.name}" }.joinToString(";")
+
+        // --- Save all data to SharedPreferences ---
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        editor.putBoolean("hasSavedState", true) // Mark that there is an in-progress game
+        editor.putString("lastPlayDate", today)
+        editor.putString("savedTargetWord", targetWord)
+        editor.putInt("currentRow", currentRow)
+        editor.putString("savedGridState", gridState)
+        editor.putString("savedKeyboardState", keyboardState)
+
+        editor.apply() // Save the changes asynchronously
+    }
+
+
+    // In Daily1.kt
+
+    private fun loadInProgressGame() {
+        val userId = auth.currentUser!!.uid
+        val prefs = getSharedPreferences("DailyChallenge_$userId", Context.MODE_PRIVATE)
+
+        // Load all the necessary data
+        targetWord = prefs.getString("savedTargetWord", "") ?: ""
+        currentRow = prefs.getInt("currentRow", 0)
+        val savedGridState = prefs.getString("savedGridState", "") ?: ""
+        val savedKeyboardState = prefs.getString("savedKeyboardState", "") ?: ""
+
+        if (targetWord.isEmpty()) {
+            // If something is wrong, just start a fresh game.
+            fetchDailyWordFromFirestore(SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()))
+            return
+        }
+
+        // Now, setup the UI
+        finishGameSetup() // This calls setupBoard() and setupKeyboard()
+
+        // Use a post block to ensure the board is ready before we modify it
+        binding.boardGrid.post {
+            // Restore the keyboard colors first
+            savedKeyboardState.split(";").forEach { state ->
+                if (state.contains(":")) {
+                    val parts = state.split(":")
+                    val char = parts[0].first()
+                    val status = LetterStatus.valueOf(parts[1])
+                    keyboardLetterStatus[char] = status
+                }
+            }
+            updateKeyboardAppearance()
+
+            // --- THIS IS THE FIX ---
+            // Restore the grid state, including text AND colors
+            val savedRows = savedGridState.split(";")
+            savedRows.forEachIndexed { i, rowString ->
+                if (i < currentRow) { // Only process completed rows
+                    val letters = rowString.split(",")
+                    val guess = letters.joinToString("")
+                    if (guess.length == cols) {
+                        // Re-apply the text to the tiles
+                        letters.forEachIndexed { j, letter ->
+                            if (j < cols) tiles[i][j]?.text = letter
+                        }
+                        // Re-color the row based on the guess
+                        colorGridRow(guess, i)
+                    }
+                } else if (i == currentRow) { // Restore text for the current, unsubmitted row
+                    val letters = rowString.split(",")
+                    var colIdx = 0
+                    letters.forEachIndexed { j, letter ->
+                        if (j < cols && letter.isNotEmpty()) {
+                            tiles[i][j]?.text = letter
+                            colIdx++
+                        }
+                    }
+                    currentCol = colIdx // Set the current column to the next empty space
+                }
+            }
+        }
+    }
+
+
 
     // --- Core Logic: Step 2 - Fetch word from Firestore ---
     private fun fetchDailyWordFromFirestore(dateStr: String) {
@@ -412,6 +526,11 @@ class Daily1 : AppCompatActivity() {
         val prefsName = "DailyChallenge_$userId"
         val prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
         val editor = prefs.edit()
+
+        editor.putBoolean("hasSavedState", false)
+        // We can also clear the keyboard state as it's not needed for replay.
+        editor.remove("savedKeyboardState")
+
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         val gridState = (0..currentRow).joinToString(";") { i ->
             (0 until cols).joinToString(",") { j -> tiles[i][j]?.text.toString() }
