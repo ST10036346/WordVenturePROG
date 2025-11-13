@@ -107,7 +107,6 @@
         android:fontFamily="@font/barriecito"
         android:elevation="8dp"/>
 
-    <!-- New Google Sign-In Button -->
     <com.google.android.gms.common.SignInButton
         android:id="@+id/google_sign_in_button"
         android:layout_width="197dp"
@@ -116,4 +115,19 @@
         android:layout_marginBottom="16dp"
         tools:ignore="MissingConstraints" />
 
+    <Button
+        android:id="@+id/fingerprint_login_button"
+        android:layout_width="200dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/rounded_button"
+        app:backgroundTint="#E2DEF1"
+        android:text="Fingerprint"
+        android:textAllCaps="false"
+        android:textColor="#051646"
+        android:textStyle="bold"
+        android:textSize="30sp"
+        android:fontFamily="@font/barriecito"
+        android:elevation="8dp"/>
 </LinearLayout>

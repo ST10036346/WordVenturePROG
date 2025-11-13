@@ -20,6 +20,12 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+// **************** NEW IMPORTS FOR BIOMETRICS ****************
+import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricManager
+import androidx.core.content.ContextCompat
+// ************************************************************
+
 class Login : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -34,6 +40,11 @@ class Login : AppCompatActivity() {
     companion object {
         private const val TAG = "Login"
     }
+
+    // **************** NEW BIOMETRIC MEMBERS ****************
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+    // *******************************************************
 
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -73,7 +84,11 @@ class Login : AppCompatActivity() {
         val emailEditText = findViewById<EditText>(R.id.email_edit_text)
         val passwordEditText = findViewById<EditText>(R.id.password_edit_text)
         val loginButton = findViewById<Button>(R.id.login_button)
-        val googleSignInButton = findViewById<SignInButton>(R.id.google_sign_in_button) // Find the Google button
+        val googleSignInButton = findViewById<SignInButton>(R.id.google_sign_in_button)
+
+        // **************** FIND NEW BIOMETRIC BUTTON ****************
+        val fingerprintLoginButton = findViewById<Button>(R.id.fingerprint_login_button)
+        // ***********************************************************
 
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
@@ -100,6 +115,14 @@ class Login : AppCompatActivity() {
         googleSignInButton.setOnClickListener {
             signInWithGoogle()
         }
+
+        // **************** BIOMETRIC SETUP AND LISTENER ****************
+        setupBiometrics()
+
+        fingerprintLoginButton.setOnClickListener {
+            checkBiometricSupportAndAuthenticate()
+        }
+        // **************************************************************
     }
 
 
@@ -139,4 +162,69 @@ class Login : AppCompatActivity() {
         }
         startActivity(intent)
     }
+
+
+    // **************** NEW BIOMETRIC FUNCTIONS ****************
+
+    private fun setupBiometrics() {
+        // Use a main thread executor, which is required for the BiometricPrompt
+        val executor = ContextCompat.getMainExecutor(this)
+
+        biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    Log.e(TAG, "Biometric authentication error: $errorCode ($errString)")
+                    Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    Log.d(TAG, "Biometric authentication success")
+                    // On successful fingerprint login, navigate to MainMenu
+                    handleSuccessfulLogin()
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    Log.w(TAG, "Biometric authentication failed")
+                    Toast.makeText(applicationContext, "Authentication failed. Try again.", Toast.LENGTH_SHORT).show()
+                }
+            })
+
+        // Configure the dialog box (PromptInfo)
+        promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Fingerprint Login")
+            .setSubtitle("Log in using your fingerprint")
+            .setNegativeButtonText("Cancel")
+            .build()
+    }
+
+    private fun checkBiometricSupportAndAuthenticate() {
+        val biometricManager = BiometricManager.from(this)
+        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                Log.d(TAG, "App can authenticate using biometrics.")
+                // Biometrics are available, show the prompt
+                biometricPrompt.authenticate(promptInfo)
+            }
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                Toast.makeText(this, "No biometric hardware available.", Toast.LENGTH_LONG).show()
+                Log.e(TAG, "No biometric hardware available.")
+            }
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+                Toast.makeText(this, "Biometric features are currently unavailable.", Toast.LENGTH_LONG).show()
+                Log.e(TAG, "Biometric features are currently unavailable.")
+            }
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                Toast.makeText(this, "No fingerprints enrolled. Please enroll a biometric credential in device settings.", Toast.LENGTH_LONG).show()
+                Log.e(TAG, "No biometric credentials enrolled.")
+            }
+            else -> {
+                Toast.makeText(this, "Biometric authentication is not possible.", Toast.LENGTH_LONG).show()
+                Log.e(TAG, "Biometric authentication is not possible (unknown error).")
+            }
+        }
+    }
+    // *******************************************************
 }
