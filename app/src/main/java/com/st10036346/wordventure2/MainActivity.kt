@@ -6,13 +6,28 @@ import android.os.Bundle
 import android.widget.Button
 import android.content.Context
 import android.content.SharedPreferences
-
+import android.os.Build
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.util.Log
 class MainActivity : AppCompatActivity() {
 
     // Constants to match the keys used in SettingsActivity
     private val PREFS_NAME = "GameSettings"
     private val KEY_SOUND = "isSoundEnabled"
 
+    // Register the activity result launcher for the permission request
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d("FCM_PERMISSION", "Notification permission granted.")
+        } else {
+            Log.d("FCM_PERMISSION", "Notification permission denied. User will not receive push notifications.")
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -31,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         startService(musicIntent)
 
 
+        askNotificationPermission()
 
         val registerButton: Button = findViewById(R.id.register_button)
         val loginButton: Button = findViewById(R.id.login_button)
@@ -43,6 +59,18 @@ class MainActivity : AppCompatActivity() {
         loginButton.setOnClickListener {
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
+        }
+    }
+
+    private fun askNotificationPermission() {
+        // This is only needed for Android 13+ (API 33+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // Request the permission
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
     }
 }

@@ -54,9 +54,10 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    // Keep these - they correctly use the BoM to get their versions
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    // firebase cloud messaging
+    implementation("com.google.firebase:firebase-messaging-ktx:24.0.0")
 
     implementation("com.google.android.gms:play-services-auth:20.5.0")
     implementation(libs.androidx.credentials)
