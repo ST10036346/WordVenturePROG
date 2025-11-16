@@ -12,9 +12,8 @@ import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import android.util.Log
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
-    // Constants to match the keys used in SettingsActivity
     private val PREFS_NAME = "GameSettings"
     private val KEY_SOUND = "isSoundEnabled"
 

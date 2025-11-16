@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WoordAvontuur2</string>
+
+    <string name="placeholder_friend_1">GamerOne77</string>
+    <string name="placeholder_friend_2">Awesome_Pal</string>
+    <string name="placeholder_friend_3">LexiConqueror</string>
+
+    <string name="discover_who_is_online">Ontdek wie aanlyn is:</string>
+    <string name="friends">Vriende</string>
+
+    <string-array name="language_options">
+        <item>Engels</item>
+        <item>Afrikaans</item>
+        <item>Zulu</item>
+        <item>Xhosa</item>
+    </string-array>
+
+    <string name="welcome_to">WELKOM BY</string>
+    <string name="register_button">Registreer</string>
+    <string name="login_button">Meld Aan</string>
+    <string name="app_logo_description">WoordAvontuur Logo</string>
+    <string name="login_title">MELD AAN</string>
+    <string name="label_email">E-pos</string>
+    <string name="hint_email">E-pos</string>
+    <string name="label_password">Wagwoord</string>
+    <string name="hint_password">Wagwoord</string>
+    <string name="fingerprint_button">Vingerafdruk</string>
+    <string name="register_title">REGISTREER</string>
+    <string name="label_username">Gebruikersnaam</string>
+    <string name="hint_username">Gebruikersnaam</string>
+    <string name="label_language">Taal</string>
+    <string name="signup_button">Registreer</string>
+    <string name="login_link_text">Het jy reeds n rekening? Meld aan</string>
+    <string name="fill_all_fields">Please fill in all fields.</string>
+    <string name="registration_success">Registration successful!</string>
+    <string name="menu_title">HOOFKIESLY</string>
+    <string name="app_name_title">WoordAvontuur</string>
+    <string name="button_daily">Daagliks</string>
+    <string name="button_play">Speel</string>
+    <string name="button_multiplayer">Multispeler</string>
+    <string name="friends_card_title">Vriende</string>
+    <string name="status_online">Aanlyn</string>
+    <string name="status_offline">Aflyn</string>
+    <string name="discover_online_status">Ontdek wie is aanlyn:</string>
+    <string name="book_icon_desc">WoordAvontuur boek-ikoon</string>
+    <string name="profile_icon_desc">Profielikoon</string>
+    <string name="settings_icon_desc">Instellingsikoon</string>
+    <string name="daily_title">DAAGLIKS</string>
+    <string name="keyboard_delete_key">VEG</string>
+    <string name="keyboard_enter_key">INDIEN</string>
+    <string name="title_enter_names">Voer Spelersname In</string>
+    <string name="hint_player_1_name">Speler 1 Naam</string>
+    <string name="hint_player_2_name">Speler 2 Naam</string>
+    <string name="button_continue">Gaan Voort</string>
+    <string name="language_title">TAAL</string>
+    <string name="coming_soon">Kom Binnekort!</string>
+    <string name="lang_english">Engels</string>
+    <string name="lang_afrikaans">Afrikaans</string>
+    <string name="lang_zulu">Zulu</string>
+    <string name="lang_xhosa">Xhosa</string>
+    <string name="levels_title">VLAKKE</string>
+    <string name="profile_title">PROFIEL</string>
+    <string name="button_logout">MELD AF</string>
+    <string name="stat_games_played">Speletjies Gespeel</string>
+    <string name="stat_win_streak">Wenreeks</string>
+    <string name="stat_max_streak">Maksimum Reeks</string>
+    <string name="stat_guess_distribution">Raai Verspreiding</string>
+    <string name="multiplayer_title">MULTISPELDER</string>
+    <string name="multiplayer_prompt">Speel plaaslik of begin n onmiddellike wedstryd</string>
+    <string name="button_local_match">Plaaslike Wedstryd</string>
+    <string name="button_random_match">Willekeurige Wedstryd</string>
+    <string name="photo_title">PROFIEL FOTO</string>
+    <string name="settings_title">INSTELLINGS</string>
+    <string name="setting_sound">Klank</string>
+    <string name="button_edit_profile">Wysig Profiel</string>
+    <string name="button_language">Taal</string>
+    <string name="button_help_support">Hulp &amp; Ondersteuning</string>
+    <string name="word_choice_title">KIES WOORD</string>
+    <string name="player_turn_format">%1$s se beurt</string>
+    <string name="win_message_format">%1$s WEN!</string>
+    <string name="score_heading">TELLING</string>
+    <string name="score_body_format">%1$s: %2$d\n%3$s: %4$d</string>
+    <string name="stats_score_format">%1$s\n%2$s</string>
+    <string name="button_play_again">Speel Weer</string>
+    <string name="button_main_menu">Hoofkieslys</string>
+    <string name="game_title_play">Speel</string>
+    <string name="title_congratulations">GELUKWENSINGS!</string>
+    <string name="stat_guess_distribution_label">Raai Verspreiding</string>
+    <string name="button_play_more">Speel Meer</string>
+    <string name="button_back_to_main_menu">Terug na Hoofkieslys</string>
+</resources>

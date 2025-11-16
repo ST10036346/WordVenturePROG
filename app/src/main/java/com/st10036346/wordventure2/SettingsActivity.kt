@@ -7,14 +7,14 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+// Removed: import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipData
 import com.st10036346.wordventure2.databinding.ActivitySettingsBinding
 
 /**
  * Activity for managing game settings like sound and navigation to other settings screens.
  */
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() { // <-- Changed to BaseActivity
 
     private lateinit var binding: ActivitySettingsBinding
 
@@ -24,7 +24,7 @@ class SettingsActivity : AppCompatActivity() {
      * Save Key-Value Data
      * Available at: https://developer.android.com/training/data-storage/shared-preferences
      */
-    private val PREFS_NAME = "GameSettings"
+    private val PREFS_NAME = "GameSettings" // Note: This is separate from LocaleManager's prefs
     private val KEY_SOUND = "isSoundEnabled"
 
     // SharedPreferences instance
@@ -96,9 +96,6 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Shows a custom dialog with the contact email for Help & Support.
-     */
     private fun showHelpSupportDialog() {
         val emailAddress = "wordventuresupport@gmail.com"
 

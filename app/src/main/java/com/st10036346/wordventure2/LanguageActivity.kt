@@ -1,11 +1,15 @@
 package com.st10036346.wordventure2
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import com.st10036346.wordventure2.BaseActivity
 import com.st10036346.wordventure2.databinding.ActivityLanguageBinding
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 
-class LanguageActivity : AppCompatActivity() {
+class LanguageActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLanguageBinding
 
@@ -15,8 +19,7 @@ class LanguageActivity : AppCompatActivity() {
         binding = ActivityLanguageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Show "Coming Soon" message
-        Toast.makeText(this, "Language settings feature coming soon!", Toast.LENGTH_LONG).show()
+        setupLanguageSelection()
 
         try {
             binding.backIcon.setOnClickListener {
@@ -24,5 +27,33 @@ class LanguageActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
         }
+    }
+
+    private fun setupLanguageSelection() {
+        // Find buttons by their assumed IDs and map them to their language codes
+        binding.root.findViewById<Button>(R.id.btnEnglish)?.setOnClickListener {
+            setNewLocale("en")
+        }
+        binding.root.findViewById<Button>(R.id.btnAfrikaans)?.setOnClickListener {
+            setNewLocale("af")
+        }
+        binding.root.findViewById<Button>(R.id.btnZulu)?.setOnClickListener {
+            setNewLocale("zu")
+        }
+    }
+
+    //applies language to application based on users choice
+    private fun setNewLocale(languageCode: String) {
+        //Save the new language
+        LocaleManager.saveLanguage(this, languageCode)
+
+        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
+
+        // Applies the locale change globally
+        AppCompatDelegate.setApplicationLocales(appLocale)
+
+        Toast.makeText(this, "Language updated successfully!", Toast.LENGTH_SHORT).show()
+
+        finish()
     }
 }

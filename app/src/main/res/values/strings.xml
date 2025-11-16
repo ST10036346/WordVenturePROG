@@ -4,13 +4,87 @@
     <string name="placeholder_friend_1">GamerOne77</string>
     <string name="placeholder_friend_2">Awesome_Pal</string>
     <string name="placeholder_friend_3">LexiConqueror</string>
-
     <string name="discover_who_is_online">Discover who is online:</string>
     <string name="friends">Friends</string>
+    <string name="fill_all_fields">Please fill in all fields.</string>
+    <string name="registration_success">Registration successful!</string>
 
     <string-array name="language_options">
         <item>English</item>
         <item>Afrikaans</item>
         <item>Zulu</item>
     </string-array>
+
+    <string name="welcome_to">WELCOME TO</string>
+    <string name="register_button">Register</string>
+    <string name="login_button">Login</string>
+    <string name="app_logo_description">Word Venture Logo</string>
+    <string name="login_title">LOGIN</string>
+    <string name="register_title">REGISTER</string>
+    <string name="label_username">Username</string>
+    <string name="hint_username">Username</string>
+    <string name="label_email">Email</string>
+    <string name="hint_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="hint_password">Password</string>
+    <string name="fingerprint_button">Fingerprint</string>
+    <string name="signup_button">Register</string>
+    <string name="label_language">Language</string>
+    <string name="login_link_text">Already have an account? Login</string>
+    <string name="menu_title">MAIN MENU</string>
+    <string name="app_name_title">WordVenture</string>
+    <string name="button_daily">Daily</string>
+    <string name="button_play">Play</string>
+    <string name="button_multiplayer">Multiplayer</string>
+    <string name="friends_card_title">Friends</string>
+    <string name="status_online">Online</string>
+    <string name="status_offline">Offline</string>
+    <string name="book_icon_desc">WordVenture book icon</string>
+    <string name="profile_icon_desc">Profile icon</string>
+    <string name="settings_icon_desc">Settings icon</string>
+    <string name="discover_online_status">Discover who is online:</string>
+    <string name="daily_title">DAILY</string>
+    <string name="keyboard_delete_key">DEL</string>
+    <string name="keyboard_enter_key">ENTER</string>
+    <string name="title_enter_names">Enter Player Names</string>
+    <string name="hint_player_1_name">Player 1 Name</string>
+    <string name="hint_player_2_name">Player 2 Name</string>
+    <string name="button_continue">Continue</string>
+    <string name="language_title">LANGUAGE</string>
+    <string name="coming_soon">Coming Soon!</string>
+    <string name="lang_english">English</string>
+    <string name="lang_afrikaans">Afrikaans</string>
+    <string name="lang_zulu">Zulu</string>
+    <string name="lang_xhosa">Xhosa</string>
+    <string name="levels_title">LEVELS</string>
+    <string name="profile_title">PROFILE</string>
+    <string name="button_logout">LOGOUT</string>
+    <string name="stat_games_played">Games Played</string>
+    <string name="stat_win_streak">Win Streak</string>
+    <string name="stat_max_streak">Max Streak</string>
+    <string name="stat_guess_distribution">Guess Distribution</string>
+    <string name="multiplayer_title">MULTIPLAYER</string>
+    <string name="multiplayer_prompt">Play local or start an instant match</string>
+    <string name="button_local_match">Local Match</string>
+    <string name="button_random_match">Random Match</string>
+    <string name="photo_title">PROFILE PHOTO</string>
+    <string name="settings_title">SETTINGS</string>
+    <string name="setting_sound">Sound</string>
+    <string name="button_edit_profile">Edit Profile</string>
+    <string name="button_language">Language</string>
+    <string name="button_help_support">Help &amp; Support</string>
+    <string name="word_choice_title">CHOOSE WORD</string>
+    <string name="player_turn_format">%1$s\'s Turn</string>
+    <string name="win_message_format">%1$s WINS!</string>
+    <string name="score_heading">SCORE</string>
+    <string name="score_body_format">%1$s: %2$d\n%3$s: %4$d</string>
+    <string name="stats_score_format">%1$s\n%2$s</string>
+    <string name="button_play_again">Play Again</string>
+    <string name="button_main_menu">Main Menu</string>
+    <string name="game_title_play">Play</string>
+    <string name="title_congratulations">CONGRATULATIONS!</string>
+    <string name="stat_guess_distribution_label">Guess Distribution</string>
+    <string name="button_play_more">Play More</string>
+    <string name="button_back_to_main_menu">Back to Main Menu</string>
+
 </resources>

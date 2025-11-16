@@ -8,7 +8,6 @@
     android:background="#E8E8D9"
     tools:context=".Muliplayer">
 
-    <!-- Header Section -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
         android:layout_width="0dp"
@@ -42,7 +41,7 @@
             android:gravity="center"
             android:paddingTop="12dp"
             android:paddingBottom="12dp"
-            android:text="MULTIPLAYER"
+            android:text="@string/multiplayer_title"
             android:textColor="#051646"
             android:textSize="31sp"
             android:textStyle="bold"
@@ -81,14 +80,13 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Main Content: Vertically Centered -->
     <TextView
         android:id="@+id/promptText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:gravity="center"
-        android:text="Play local or start an\ninstant match"
+        android:text="@string/multiplayer_prompt"
         android:textColor="#051646"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -105,7 +103,7 @@
         android:layout_width="250dp"
         android:layout_height="70dp"
         android:backgroundTint="#C9BFFB"
-        android:text="Local Match"
+        android:text="@string/button_local_match"
         android:textColor="#051646"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -121,7 +119,7 @@
         android:layout_height="70dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="#C9BFFB"
-        android:text="Random Match"
+        android:text="@string/button_random_match"
         android:textColor="#051646"
         android:textSize="24sp"
         android:textStyle="bold"

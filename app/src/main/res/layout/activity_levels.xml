@@ -40,7 +40,7 @@
             android:gravity="center"
             android:paddingBottom="12dp"
             android:paddingTop="12dp"
-            android:text="LEVELS"
+            android:text="@string/levels_title"
             android:textColor="#051646"
             android:textSize="35sp"
             android:textStyle="bold"

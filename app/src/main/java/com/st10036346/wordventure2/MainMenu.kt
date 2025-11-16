@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class MainMenu : AppCompatActivity() {
+class MainMenu : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
 

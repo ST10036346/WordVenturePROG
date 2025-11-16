@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:fontFamily="@font/barriecito"
-        android:text="PLAYER 1 WINS!"
+        android:text="@string/win_message_format"
         android:textColor="#051646"
         android:textSize="34sp"
         android:textStyle="bold" />
@@ -41,7 +41,7 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="#C9BFFB"
         android:fontFamily="@font/barriecito"
-        android:text="Play Again"
+        android:text="@string/button_play_again"
         android:textColor="#051646"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -54,7 +54,7 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="#C9BFFB"
         android:fontFamily="@font/barriecito"
-        android:text="Main Menu"
+        android:text="@string/button_main_menu"
         android:textColor="#051646"
         android:textSize="20sp"
         android:textStyle="bold" />

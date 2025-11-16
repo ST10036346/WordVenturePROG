@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WordVenture2</string>
+
+    <string name="placeholder_friend_1">GamerOne77</string>
+    <string name="placeholder_friend_2">Awesome_Pal</string>
+    <string name="placeholder_friend_3">LexiConqueror</string>
+
+    <string name="discover_who_is_online">Thola ukuthi ubani oku-inthanethi:</string>
+
+    <string name="friends">Abangani</string>
+
+    <string-array name="language_options">
+        <item>IsiNgisi</item>
+        <item>IsiBhunu</item>
+        <item>IsiZulu</item>
+        <item>IsiXhosa</item>
+    </string-array>
+
+    <string name="welcome_to">WAMUKELA KU</string>
+    <string name="register_button">Bhalisa</string>
+    <string name="login_button">Ngena</string>
+    <string name="app_logo_description">I-Word Venture Logo</string>
+    <string name="login_title">NGENA</string>
+    <string name="label_email">I-imeyili</string>
+    <string name="hint_email">I-imeyili</string>
+    <string name="label_password">Iphasiwedi</string>
+    <string name="hint_password">Iphasiwedi</string>
+    <string name="fingerprint_button">Isigxivizo seminwe</string>
+    <string name="register_title">BHALISA</string>
+    <string name="label_username">Igama lomsebenzisi</string>
+    <string name="hint_username">Igama lomsebenzisi</string>
+    <string name="label_language">Ulimi</string>
+    <string name="signup_button">Bhalisa</string>
+    <string name="login_link_text">Usuvele unayo i-akhawunti? Ngena</string>
+    <string name="fill_all_fields">Ngicela ugcwalise zonke izinkalo.</string>
+    <string name="registration_success">Ukubhalisa kuphumelele!</string>
+    <string name="menu_title">IMENU ENKULU</string>
+    <string name="app_name_title">I-WordVenture</string>
+    <string name="button_daily">Imihla ngemihla</string>
+    <string name="button_play">Dlala</string>
+    <string name="button_multiplayer">Abadlali abaningi</string>
+    <string name="friends_card_title">Abangane</string>
+    <string name="status_online">Ku-inthanethi</string>
+    <string name="status_offline">Akukho-inthanethi</string>
+    <string name="discover_online_status">Thola ukuthi ubani oku-inthanethi:</string>
+    <string name="book_icon_desc">Isithonjana sencwadi se-WordVenture</string>
+    <string name="profile_icon_desc">Isithonjana sephrofayela</string>
+    <string name="settings_icon_desc">Isithonjana sezilungiselelo</string>
+    <string name="daily_title">IMIHLA NGEMIHLA</string>
+    <string name="keyboard_delete_key">SUSA</string>
+    <string name="keyboard_enter_key">FAKA</string>
+    <string name="title_enter_names">Faka Amagama Abadlali</string>
+    <string name="hint_player_1_name">Igama Lomdlali 1</string>
+    <string name="hint_player_2_name">Igama Lomdlali 2</string>
+    <string name="button_continue">Qhubeka</string>
+    <string name="language_title">ULIMI</string>
+    <string name="coming_soon">Iyeza Maduze!</string>
+    <string name="lang_english">IsiNgisi</string>
+    <string name="lang_afrikaans">IsiBhunu</string>
+    <string name="lang_zulu">IsiZulu</string>
+    <string name="lang_xhosa">IsiXhosa</string>
+    <string name="levels_title">AMAZINGA</string>
+    <string name="profile_title">IPHROFAYILI</string>
+    <string name="button_logout">PHUMA</string>
+    <string name="stat_games_played">Imidlalo Edlalwe</string>
+    <string name="stat_win_streak">Uchungechunge Lwokuwina</string>
+    <string name="stat_max_streak">Uchungechunge Olukhulu</string>
+    <string name="stat_guess_distribution">Ukusabalalisa Ukucabanga</string>
+    <string name="multiplayer_title">ABADLALI ABANINGI</string>
+    <string name="multiplayer_prompt">Dlala endaweni noma uqale umdlalo osheshayo</string>
+    <string name="button_local_match">Umdlalo Wasendaweni</string>
+    <string name="button_random_match">Umdlalo Ongahleliwe</string>
+    <string name="photo_title">ISITHOMBE SEPHROFAYILI</string>
+    <string name="settings_title">IZILUNGISELELO</string>
+    <string name="setting_sound">Umsindo</string>
+    <string name="button_edit_profile">Hlela Iphrofayili</string>
+    <string name="button_language">Ulimi</string>
+    <string name="button_help_support">Usizo Nokweseka</string>
+    <string name="word_choice_title">KHETHA IGAMA</string>
+    <string name="player_turn_format">Ithuba lika%1$s</string>
+    <string name="win_message_format">%1$s UWINA!</string>
+    <string name="score_heading">AMAPHUZU</string>
+    <string name="score_body_format">%1$s: %2$d\n%3$s: %4$d</string>
+    <string name="stats_score_format">%1$s\n%2$s</string>
+    <string name="button_play_again">Dlala Futhi</string>
+    <string name="button_main_menu">I-Main Menu</string>
+    <string name="game_title_play">Dlala</string>
+    <string name="title_congratulations">HALALA!</string>
+    <string name="stat_guess_distribution_label">Ukusabalalisa Ukucabanga</string>
+    <string name="button_play_more">Dlala Okwengeziwe</string>
+    <string name="button_back_to_main_menu">Buyela Ku-Main Menu</string>
+
+</resources>

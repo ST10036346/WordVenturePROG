@@ -37,7 +37,7 @@
             android:id="@+id/settingsTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Play"
+            android:text="@string/game_title_play"
             android:textColor="#051646"
             android:textSize="35sp"
             android:textStyle="bold"

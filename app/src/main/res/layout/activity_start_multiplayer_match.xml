@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="CHOOSE WORD"
+            android:text="@string/word_choice_title"
             android:textColor="#051646"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -99,7 +99,7 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    tools:text="Player 1's Turn" />
+    tools:text="@string/player_turn_format" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

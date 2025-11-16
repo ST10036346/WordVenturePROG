@@ -12,7 +12,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter Player Names"
+        android:text="@string/title_enter_names"
         android:textSize="28sp"
         android:textStyle="bold"
         android:layout_marginBottom="40dp"/>
@@ -21,7 +21,7 @@
         android:id="@+id/player1NameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Player 1 Name"
+        android:hint="@string/hint_player_1_name"
         android:inputType="textPersonName"
         android:maxLines="1"
         android:layout_marginBottom="16dp"/>
@@ -30,7 +30,7 @@
         android:id="@+id/player2NameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Player 2 Name"
+        android:hint="@string/hint_player_2_name"
         android:inputType="textPersonName"
         android:maxLines="1"
         android:layout_marginBottom="32dp"/>
@@ -39,7 +39,7 @@
         android:id="@+id/continueButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Continue"
+        android:text="@string/button_continue"
         android:paddingLeft="32dp"
         android:paddingRight="32dp"
         android:paddingTop="12dp"
