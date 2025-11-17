@@ -44,6 +44,16 @@ class Play : AppCompatActivity() {
     private var currentCol = 0
     private var targetWord = ""
 
+    // NEW: List of fallback words to use when the API is unreachable
+    private val FALLBACK_WORDS = listOf(
+        "TABLE", "CHAIR", "DREAM", "LIGHT", "FLUID",
+        "SHAKE", "FROST", "GHOST", "BLANK", "STORY",
+        "BRICK", "POWER", "QUICK", "VALVE", "YIELD"
+        // Add many more words here to prevent repetition!
+    )
+    // Key for tracking the index of the last used fallback word
+    private val KEY_FALLBACK_INDEX = "fallback_word_index"
+
     // --- LEVEL TRACKING ---
     private var currentLevelNumber: Int = 1
     // Standardized base name for Level Progress file
@@ -170,41 +180,43 @@ class Play : AppCompatActivity() {
         }
     }
 
+    // UPDATED: Logic to fall back to proceedWithGuess on network failure
     private fun onEnterPressed() {
         if (currentCol != cols) {
             Toast.makeText(this, "Not enough letters", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }.uppercase()
+        val guess = (0 until cols).joinToString("") { j -> tiles[currentRow][j]?.text.toString() }.uppercase(Locale.ROOT)
         val safeContext = this
         val guessBody = WordGuess(guess)
 
-        binding.keyboardLayout.isEnabled = false
+        binding.keyboardLayout.isEnabled = false // Disable keyboard while processing
 
-        //API call to validate word
+        // API call to validate word
         RetrofitClient.instance.checkWord(guessBody).enqueue(object : Callback<CheckWordResponse> {
             override fun onResponse(call: Call<CheckWordResponse>, response: Response<CheckWordResponse>) {
                 if (response.isSuccessful && response.body()?.valid == true) {
-                    //Word is valid
+                    // ONLINE SUCCESS: Word is valid, proceed with game logic
                     runOnUiThread {
                         proceedWithGuess(guess)
                     }
                 } else {
-                    //Word is not in the dictionary
+                    // ONLINE FAILURE: Word is not in the dictionary (or bad API response)
                     Handler(Looper.getMainLooper()).postDelayed({
-                        Toast.makeText(applicationContext, "Not in word list", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(applicationContext, "Not in word list (Online Check)", Toast.LENGTH_SHORT).show()
                         binding.keyboardLayout.isEnabled = true
                     }, 50)
                 }
             }
 
             override fun onFailure(call: Call<CheckWordResponse>, t: Throwable) {
-                // Network error has occured
-                android.util.Log.e("API_FAILURE", "Retrofit call failed", t)
+                // OFFLINE MODE: Network error occurred. Assume word is valid and proceed.
+                android.util.Log.e("API_FAILURE", "Retrofit call failed - Assuming valid word for offline play", t)
                 Handler(Looper.getMainLooper()).post {
-                    Toast.makeText(safeContext, "Could not verify word", Toast.LENGTH_SHORT).show()
-                    binding.keyboardLayout.isEnabled = true
+                    Toast.makeText(safeContext, "Offline Mode: Guessing without dictionary check.", Toast.LENGTH_SHORT).show()
+                    // Proceed with guess, allowing the user to continue the game
+                    proceedWithGuess(guess)
                 }
             }
         })
@@ -320,25 +332,52 @@ class Play : AppCompatActivity() {
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
     }
 
-    //Fetches random word from API
+    // UPDATED: Logic to use fallback word on API failure
     private fun fetchWordleWord() {
+        // Attempt API call first for any level
         RetrofitClient.instance.getRandomWord().enqueue(object : Callback<WordResponse> {
             override fun onResponse(call: Call<WordResponse>, response: Response<WordResponse>) {
                 if (response.isSuccessful) {
-                    targetWord = response.body()?.word?.uppercase() ?: "APPLE"
-                    binding.keyboardLayout.visibility = View.VISIBLE //Shows keyboard once the word has loaded for the game
+                    // SUCCESS: Use the word fetched from the API (Online Mode)
+                    targetWord = response.body()?.word?.uppercase(Locale.ROOT) ?: "APPLE"
+                    binding.keyboardLayout.visibility = View.VISIBLE
+                    Toast.makeText(this@Play, "Online Word Loaded.", Toast.LENGTH_SHORT).show()
                 } else {
-                    targetWord = "ERROR" //Fallback word if API is unsuccessful
-                    Toast.makeText(this@Play, "Failed to get a word.", Toast.LENGTH_LONG).show()
+                    // FAILURE: API was reached, but response was bad (Server Error). Use fallback word.
+                    useFallbackWord()
+                    Toast.makeText(this@Play, "API Error. Using offline word.", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onFailure(call: Call<WordResponse>, t: Throwable) {
-                targetWord = "LOCAL" // Fallback for network failure
-                binding.keyboardLayout.visibility = View.VISIBLE
-                Toast.makeText(this@Play, "Network Error. Using default word.", Toast.LENGTH_LONG).show()
+                // FAILURE: Network error occurred (Offline Mode). Use fallback word.
+                android.util.Log.e("API_FAILURE", "Network Error. Using fallback word.", t)
+                useFallbackWord()
+                Toast.makeText(this@Play, "Network Error. Using offline word.", Toast.LENGTH_LONG).show()
             }
         })
+    }
+
+    // NEW FUNCTION: Logic to select the next word from the local list
+    private fun useFallbackWord() {
+        // Determine the preferences file name based on the current user ID
+        val prefsNameWithId = "${BASE_PREFS_NAME}_${currentUserId}"
+        val prefs = getSharedPreferences(prefsNameWithId, Context.MODE_PRIVATE)
+
+        // 1. Get the current index. Default is 0.
+        val currentIndex = prefs.getInt(KEY_FALLBACK_INDEX, 0)
+
+        // 2. Select the word using the current index.
+        // Use the modulus operator (%) to loop back to the start if the list is exhausted.
+        val wordIndexToUse = currentIndex % FALLBACK_WORDS.size
+        targetWord = FALLBACK_WORDS[wordIndexToUse].uppercase(Locale.ROOT)
+
+        // 3. Save the index for the NEXT word
+        val nextIndex = (currentIndex + 1) % FALLBACK_WORDS.size
+        prefs.edit().putInt(KEY_FALLBACK_INDEX, nextIndex).apply()
+
+        // Show the keyboard
+        binding.keyboardLayout.visibility = View.VISIBLE
     }
 
     //Keyboard setup
