@@ -1,8 +1,12 @@
 package com.st10036346.wordventure2
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -20,11 +24,17 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-// **************** NEW IMPORTS FOR BIOMETRICS ****************
+// BIOMETRICS
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
-// ************************************************************
+
+// PUSH NOTIFICATIONS & NETWORKING
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.awaitResponse
 
 class Login : AppCompatActivity() {
 
@@ -37,14 +47,21 @@ class Login : AppCompatActivity() {
      */
     private lateinit var googleSignInClient: GoogleSignInClient // Client for Google Sign-In
 
+    // FCM/RETROFIT MEMBERS
+    private val apiService by lazy { RetrofitClient.instance }
+    private lateinit var sharedPrefs: SharedPreferences
+    private val PREFS_NAME = "AuthPrefs"
+    private val KEY_USER_ID = "userId"
+
     companion object {
         private const val TAG = "Login"
+        // Delay to allow asynchronous FCM logs to print before navigation completes
+        private const val NAVIGATION_DELAY_MS = 1000L // 1 second delay for logs
     }
 
-    // **************** NEW BIOMETRIC MEMBERS ****************
+    // BIOMETRIC MEMBERS
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
-    // *******************************************************
 
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -73,6 +90,8 @@ class Login : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         auth = Firebase.auth
+        // Initialize SharedPreferences
+        sharedPrefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
@@ -86,9 +105,8 @@ class Login : AppCompatActivity() {
         val loginButton = findViewById<Button>(R.id.login_button)
         val googleSignInButton = findViewById<SignInButton>(R.id.google_sign_in_button)
 
-        // **************** FIND NEW BIOMETRIC BUTTON ****************
+        // BIOMETRIC BUTTON
         val fingerprintLoginButton = findViewById<Button>(R.id.fingerprint_login_button)
-        // ***********************************************************
 
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
@@ -116,13 +134,12 @@ class Login : AppCompatActivity() {
             signInWithGoogle()
         }
 
-        // **************** BIOMETRIC SETUP AND LISTENER ****************
+        // BIOMETRIC SETUP AND LISTENER
         setupBiometrics()
 
         fingerprintLoginButton.setOnClickListener {
             checkBiometricSupportAndAuthenticate()
         }
-        // **************************************************************
     }
 
 
@@ -154,17 +171,77 @@ class Login : AppCompatActivity() {
 
     private fun handleSuccessfulLogin() {
         val user = auth.currentUser
-        Toast.makeText(this, "Login successful for ${user?.email}", Toast.LENGTH_SHORT).show()
+        val userId = user?.uid // Get the unique Firebase User ID
 
-        Log.i(TAG, "Navigating to MainMenu activity. Clearing activity stack.")
-        val intent = Intent(this, MainMenu::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        if (userId != null) {
+            // 1. SAVE the User ID locally for the Messaging Service
+            sharedPrefs.edit().putString(KEY_USER_ID, userId).apply()
+            Log.d(TAG, "User ID ($userId) saved to SharedPreferences.")
+
+            // 2. SYNCHRONISE the FCM token with the backend
+            syncFcmToken(userId)
+
+            // 3. Navigate (delayed to allow sync logs to appear)
+            Toast.makeText(this, "Login successful for ${user?.email}", Toast.LENGTH_SHORT).show()
+            Log.i(TAG, "Starting delayed navigation to MainMenu activity.")
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                val intent = Intent(this, MainMenu::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
+            }, NAVIGATION_DELAY_MS) // Wait 1 second before navigating
+
+        } else {
+            Toast.makeText(this, "Login failed: User ID is null.", Toast.LENGTH_LONG).show()
         }
-        startActivity(intent)
+    }
+
+    // Fetches the current FCM token and initiates the registration process
+    private fun syncFcmToken(userId: String) {
+        // *** NEW DEBUG LOG: This should appear if syncFcmToken is called ***
+        Log.e(TAG, "FCM SYNC STARTING for user: $userId")
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+            Log.d(TAG, "Current FCM Token: $token")
+
+            // Send to your backend
+            if (token != null) {
+                sendRegistrationToServer(userId, token)
+            }
+        }
     }
 
 
-    // **************** NEW BIOMETRIC FUNCTIONS ****************
+    // Makes the actual network call to your Render backend to register the token.
+    private fun sendRegistrationToServer(userId: String, token: String) {
+        // Run network operation in a background thread
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val requestBody = FcmTokenRequest(token)
+                val response = apiService.patchFcmToken(userId, requestBody).awaitResponse()
+
+                if (response.isSuccessful) {
+                    Log.i(TAG, "FCM Token successfully registered for user $userId. Status: ${response.code()}")
+                } else {
+                    // Log the failure, but don't stop the user from using the app
+                    Log.e(TAG, "FCM Token registration FAILED for user $userId. Status: ${response.code()}, Body: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "FCM Token registration network error for $userId: ${e.message}")
+            }
+        }
+    }
+
+
+    // BIOMETRIC FUNCTIONS
 
     private fun setupBiometrics() {
         // Use a main thread executor, which is required for the BiometricPrompt
@@ -226,5 +303,4 @@ class Login : AppCompatActivity() {
             }
         }
     }
-    // *******************************************************
 }

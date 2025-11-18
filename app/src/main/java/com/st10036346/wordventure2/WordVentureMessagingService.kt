@@ -10,15 +10,21 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+
+// PUSH NOTIFICATIONS & NETWORKING IMPORTS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.awaitResponse
 
 class WordVentureMessagingService : FirebaseMessagingService() {
     private val TAG = "FCM_Service"
     private val CHANNEL_ID = "word_of_the_day_channel"
     private val PREFS_NAME = "AuthPrefs"
-    private val KEY_USER_ID = "userId" // We will use this key to store the user's ID
+    private val KEY_USER_ID = "userId" // use this key to store the user's ID
+
+    // Retrofit service instance
+    private val apiService by lazy { RetrofitClient.instance }
 
     /**
      * Called if the FCM registration token is updated. This happens if the
@@ -27,18 +33,15 @@ class WordVentureMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
 
-        // This is where we need to re-sync the token with your backend API.
-        // We retrieve the stored user ID from local storage to associate the token.
+        // Retrieve the stored user ID from local storage to associate the token.
         val userId = getLoggedInUserId()
 
         if (userId != null) {
-            // Note: We use a coroutine to make the network call asynchronously
-            CoroutineScope(Dispatchers.IO).launch {
-                sendRegistrationToServer(userId, token)
-            }
+            // Initiate the synchronisation process
+            sendRegistrationToServer(userId, token)
         } else {
-            // If we can't find a user ID, the token will be sent when the user logs in next.
-            Log.w(TAG, "No logged-in user ID found locally to sync new token.")
+            // If no user ID is found, the token will be sent when the user logs in next.
+            Log.w(TAG, "No logged-in user ID found locally to sync new token. Will sync on next successful login.")
         }
     }
 
@@ -48,14 +51,10 @@ class WordVentureMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d(TAG, "From: ${remoteMessage.from}")
 
-        // Check if the message contains a data payload (usually for custom content)
         remoteMessage.data.isNotEmpty().let {
             Log.d(TAG, "Message data payload: " + remoteMessage.data)
-            // You can process the data here, e.g., show a more specific notification
-            // based on the word ID or category sent by the server.
         }
 
-        // Check if the message contains a notification payload (for display)
         remoteMessage.notification?.let {
             Log.d(TAG, "Message Notification Body: ${it.body}")
             // The default body/title will be used if provided by the server
@@ -98,17 +97,32 @@ class WordVentureMessagingService : FirebaseMessagingService() {
         notificationManager.notify(0, notificationBuilder.build())
     }
 
-    // --- Helper Functions for Token Sync ---
+    // Helper Functions for Token Sync
 
     private fun getLoggedInUserId(): String? {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getString(KEY_USER_ID, null)
     }
 
+    /**
+     * Makes the actual network call to your Render backend to register the token.
+     */
     private fun sendRegistrationToServer(userId: String, token: String) {
-        // You need to define a function in ApiService.kt to handle this API call
-        // E.g., @POST("users/{userId}/fcm-token") fun updateFCMToken(@Path("userId") userId: String, @Body tokenData: TokenRequest): Call<Void>
-        Log.i(TAG, "Attempting to sync token for user $userId: $token")
-        // TODO: Implement actual Retrofit call here using your ApiService.kt
+        // Run network operation in a background thread
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val requestBody = FcmTokenRequest(token)
+                val response = apiService.patchFcmToken(userId, requestBody).awaitResponse()
+
+                if (response.isSuccessful) {
+                    Log.i(TAG, "FCM Token successfully registered for user $userId. Status: ${response.code()}")
+                } else {
+                    // Log the failure, but don't stop the user from using the app
+                    Log.e(TAG, "FCM Token registration FAILED for user $userId. Status: ${response.code()}, Body: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "FCM Token registration network error for $userId: ${e.message}")
+            }
+        }
     }
 }
