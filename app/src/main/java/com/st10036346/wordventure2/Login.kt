@@ -24,12 +24,9 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-// BIOMETRICS
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
-
-// PUSH NOTIFICATIONS & NETWORKING
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,7 +87,6 @@ class Login : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         auth = Firebase.auth
-        // Initialize SharedPreferences
         sharedPrefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -197,9 +193,13 @@ class Login : AppCompatActivity() {
         }
     }
 
+    //Title: Firebase Cloud Messaging
+    //Name: Firebase
+    //Date: 2025
+    //URL: https://firebase.google.com/docs/cloud-messaging
+    
     // Fetches the current FCM token and initiates the registration process
     private fun syncFcmToken(userId: String) {
-        // *** NEW DEBUG LOG: This should appear if syncFcmToken is called ***
         Log.e(TAG, "FCM SYNC STARTING for user: $userId")
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
@@ -212,7 +212,6 @@ class Login : AppCompatActivity() {
             val token = task.result
             Log.d(TAG, "Current FCM Token: $token")
 
-            // Send to your backend
             if (token != null) {
                 sendRegistrationToServer(userId, token)
             }
@@ -220,7 +219,7 @@ class Login : AppCompatActivity() {
     }
 
 
-    // Makes the actual network call to your Render backend to register the token.
+    // Makes the actual network call to Render backend to register the token.
     private fun sendRegistrationToServer(userId: String, token: String) {
         // Run network operation in a background thread
         CoroutineScope(Dispatchers.IO).launch {
