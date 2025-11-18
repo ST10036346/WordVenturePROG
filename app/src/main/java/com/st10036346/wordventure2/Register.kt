@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-// NEW REQUIRED IMPORT
 import com.st10036346.wordventure2.LocaleManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
