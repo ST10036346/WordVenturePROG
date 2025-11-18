@@ -7,27 +7,22 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.Toast
-// Removed: import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipData
 import com.st10036346.wordventure2.databinding.ActivitySettingsBinding
 
-/**
- * Activity for managing game settings like sound and navigation to other settings screens.
- */
-class SettingsActivity : BaseActivity() { // <-- Changed to BaseActivity
+
+class SettingsActivity : BaseActivity() { 
 
     private lateinit var binding: ActivitySettingsBinding
 
-    // SharedPreferences name for saving user preferences
     /**
      * Android Developers, 2025.
      * Save Key-Value Data
      * Available at: https://developer.android.com/training/data-storage/shared-preferences
      */
-    private val PREFS_NAME = "GameSettings" // Note: This is separate from LocaleManager's prefs
+    private val PREFS_NAME = "GameSettings" 
     private val KEY_SOUND = "isSoundEnabled"
 
-    // SharedPreferences instance
     private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +41,7 @@ class SettingsActivity : BaseActivity() { // <-- Changed to BaseActivity
         setListeners()
     }
 
-    /**
-     * Loads saved preferences.
-     */
+    //loads saved preferences
     private fun setInitialState() {
         val isSound = prefs.getBoolean(KEY_SOUND, true) // Default to sound on
 
@@ -56,9 +49,7 @@ class SettingsActivity : BaseActivity() { // <-- Changed to BaseActivity
 
     }
 
-    /**
-     * Sets up all click and change listeners for navigation and settings toggles.
-     */
+    
     private fun setListeners() {
         binding.bookIcon.setOnClickListener {
             // navigate to the Main Menu.
