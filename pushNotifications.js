@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const admin = require('firebase-admin');
 
-// --- 1. INITIALIZE FIREBASE ADMIN SDK ---
+// 1. INITIALIZE FIREBASE ADMIN SDK 
 const serviceAccount = require('./serviceAccountKey.json');
 
 // Initialize the Admin SDK if it hasn't been already
@@ -14,13 +14,12 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-// --- PLACEHOLDER MIDDLEWARE ---
 const verifyAuth = (req, res, next) => {
     console.log("Authorization Check: Passing for development.");
     next(); 
 };
 
-// --- ENDPOINT A: REGISTER/UPDATE FCM TOKEN (Completes Phase 2) ---
+//ENDPOINT A: REGISTER/UPDATE FCM TOKEN 
 router.patch('/users/:userId/fcm-token', verifyAuth, async (req, res) => {
     const userId = req.params.userId;
     const { fcmToken } = req.body; 
@@ -46,9 +45,9 @@ router.patch('/users/:userId/fcm-token', verifyAuth, async (req, res) => {
 });
 
 
-// --- ENDPOINT B: SEND DAILY WORD PUSH ---
+// ENDPOINT B: SEND DAILY WORD PUSH 
 router.post('/send-daily-word-push', async (req, res) => {
-    const dailyWord = req.body.word || 'STORM'; // Example default word
+    const dailyWord = req.body.word || 'STORM'; 
 
     try {
         // 1. Get ALL users' tokens
@@ -84,7 +83,6 @@ router.post('/send-daily-word-push', async (req, res) => {
         
         console.log(`[FCM] Successfully sent message to ${response.successCount} devices.`);
         
-        // Optional: Clean up tokens that failed (response.failureCount > 0)
         
         res.status(200).send({ 
             message: 'Push notifications sent.',
