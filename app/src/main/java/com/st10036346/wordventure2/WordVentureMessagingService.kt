@@ -105,7 +105,7 @@ class WordVentureMessagingService : FirebaseMessagingService() {
     }
 
     /**
-     * Makes the actual network call to your Render backend to register the token.
+     * Makes the actual network call to Render backend to register the token.
      */
     private fun sendRegistrationToServer(userId: String, token: String) {
         // Run network operation in a background thread
