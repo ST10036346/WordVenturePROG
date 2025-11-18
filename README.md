@@ -92,13 +92,9 @@ Players can enjoy quick daily challenges, dive into continuous level-based play,
 |Component|Technology|Purpose|
 |---|---|---|
 |**Frontend**|Android Native (Kotlin/Java)|Core application logic and User Interface|
-|---|---|---|
 |**Backend API**|Node.js / Express|Provides daily words, validation, and statistics|
-|---|---|---|
 |**Database**|Firebase|Secure user authentication and cloud data storage|
-|---|---|---|
 |**Messaging**|Retrofit|Type-safe HTTP client for communication with the Node.js API|
-|---|---|---|
 |**Messaging**|Firebase Cloud Messaging (FCM)|Handles server-triggered Daily Push Notifications|
 ---
 
@@ -165,15 +161,10 @@ This release establsihed the foundation of the game, focusing on core functional
 |Feature|Innovative Contribution|
 |---|---|
 |**Continuous Level Play**|The core differentiator: provides unlimited gameplay that moves beyond the single-daily-word limit to maximise player retention|
-|---|---|
 |**Server-Triggered Daily Push Notifications**|Implemented Firebase Cloud Messaging (FCM) to send targeted "New word is ready!" notifications, significantly increasing daily user engagement|
-|---|---|
 |**Decoupled Game Logic & Stats**|The game logic and dedicated Statistics Manager (StatsManager.kt) were separated from the UI for easy unit testing and future feature expansion, ensuring a scalable foundation|
-|---|---|
 |**Android 13+ Notification Permissions**|Implemented the required runtime permission check (POST_NOTIFICATIONS) for a modern, professional Android user experience|
-|---|---|
 |**Automated Unit Testing CI**|Implemented GitHub Actions to automate builds and test runs on every commit, ensuring code stability and quality assurance across the development team|
-|---|---|
 |**Retrofit API Integration**|Established type-safe network calls to the Node.js API using RetrofitClient.kt, ensuring reliable and efficient fetching of dynamic daily content|
 ---
 
