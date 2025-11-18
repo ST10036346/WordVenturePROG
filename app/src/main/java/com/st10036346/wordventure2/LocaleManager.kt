@@ -8,6 +8,11 @@ import java.util.Locale
 
 object LocaleManager {
 
+    //Title: Locale
+    //Name: Android Developers
+    //Date: 2025
+    //URL: https://developer.android.com/reference/java/util/Locale#obtaining-a-locale
+
     private const val PREFS_NAME = "AppLocaleSettings"
     private const val KEY_LANGUAGE = "language_code"
     const val DEFAULT_LANG = "en" // English as default language
