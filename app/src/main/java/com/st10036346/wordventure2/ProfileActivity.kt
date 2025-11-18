@@ -23,7 +23,6 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var statsManager: StatsManager
-    // NEW PROPERTY: To hold the authenticated user's ID
     private lateinit var currentUserId: String
 
     companion object {
@@ -45,14 +44,14 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
-        // FIX: Store the current user's ID
+        // Store the current user's ID
         currentUserId = user.uid
 
         // initialise View Binding
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // FIX: initialise StatsManager, passing the required userId
+        // initialise StatsManager, passing the required userId
         statsManager = StatsManager(this, currentUserId)
 
         // populate UI with user data
@@ -217,9 +216,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Set up click listeners for nav bar and profile actions.
-     */
+    
     private fun setListeners() {
         // navigates to previous screen
         binding.backIcon.setOnClickListener {
@@ -281,9 +278,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Shows an AlertDialog to confirm the user wants to log out.
-     */
+    
     private fun showLogoutConfirmationDialog() {
         AlertDialog.Builder(this)
             .setTitle("Confirm Logout")
@@ -301,9 +296,7 @@ class ProfileActivity : AppCompatActivity() {
             .show()
     }
 
-    /**
-     * Helper function to clear the activity stack and redirect to the Login screen.
-     */
+    
     private fun redirectToLogin() {
         // Assuming 'Login' is the name of your login activity class
         val intent = Intent(this, Login::class.java).apply {
