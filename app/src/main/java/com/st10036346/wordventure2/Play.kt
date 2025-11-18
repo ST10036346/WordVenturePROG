@@ -18,13 +18,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-
-// Imports for Firebase Auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-import com.st10036346.wordventure2.databinding.PlayScreenBinding // Correct Binding Import
+import com.st10036346.wordventure2.databinding.PlayScreenBinding 
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -44,24 +42,21 @@ class Play : AppCompatActivity() {
     private var currentCol = 0
     private var targetWord = ""
 
-    // NEW: List of fallback words to use when the API is unreachable
+    // List of fallback words to use when the API is unreachable
     private val FALLBACK_WORDS = listOf(
         "TABLE", "CHAIR", "DREAM", "LIGHT", "FLUID",
         "SHAKE", "FROST", "GHOST", "BLANK", "STORY",
         "BRICK", "POWER", "QUICK", "VALVE", "YIELD"
-        // Add many more words here to prevent repetition!
     )
     // Key for tracking the index of the last used fallback word
     private val KEY_FALLBACK_INDEX = "fallback_word_index"
 
-    // --- LEVEL TRACKING ---
+    //  LEVEL TRACKING 
     private var currentLevelNumber: Int = 1
-    // Standardized base name for Level Progress file
     private val BASE_PREFS_NAME = "GameProgress"
     private val KEY_UNLOCKED_LEVEL = "current_level_unlocked"
     // Stores the user ID obtained in onCreate
     private lateinit var currentUserId: String
-    // ----------------------
 
     private lateinit var statsManager: StatsManager
     private lateinit var auth: FirebaseAuth
@@ -99,7 +94,7 @@ class Play : AppCompatActivity() {
         // Store the user ID globally for this activity
         currentUserId = userId
 
-        // 4. FIX: Initialize StatsManager correctly with the unique user ID
+        // 4. Initialize StatsManager correctly with the unique user ID
         statsManager = StatsManager(this, currentUserId)
 
         // Get the level number passed from the Levels screen
@@ -132,7 +127,7 @@ class Play : AppCompatActivity() {
     }
 
     private fun saveLevelProgress(levelCompleted: Int) {
-        // FIX: Append the currentUserId to the preference file name to save progress uniquely
+        // Append the currentUserId to the preference file name to save progress uniquely
         val prefsNameWithId = "${BASE_PREFS_NAME}_${currentUserId}"
         val prefs = getSharedPreferences(prefsNameWithId, Context.MODE_PRIVATE)
         val nextLevel = levelCompleted + 1
@@ -180,7 +175,7 @@ class Play : AppCompatActivity() {
         }
     }
 
-    // UPDATED: Logic to fall back to proceedWithGuess on network failure
+    // Logic to fall back to proceedWithGuess on network failure
     private fun onEnterPressed() {
         if (currentCol != cols) {
             Toast.makeText(this, "Not enough letters", Toast.LENGTH_SHORT).show()
@@ -296,7 +291,7 @@ class Play : AppCompatActivity() {
             Toast.makeText(this, "The word was: $targetWord", Toast.LENGTH_LONG).show()
         }
 
-        // 2. HIDE ALL STATS ELEMENTS (as requested)
+        // 2. HIDE ALL STATS ELEMENTS 
         binding.statsPanel.statsMetricsContainer.visibility = View.GONE
         binding.statsPanel.guessDistributionLabel.visibility = View.GONE
         binding.statsPanel.guessDistributionChartContainer.visibility = View.GONE
@@ -332,7 +327,7 @@ class Play : AppCompatActivity() {
         binding.statsPanelContainer.animate().translationY(0f).setDuration(500).start()
     }
 
-    // UPDATED: Logic to use fallback word on API failure
+    // Logic to use fallback word on API failure
     private fun fetchWordleWord() {
         // Attempt API call first for any level
         RetrofitClient.instance.getRandomWord().enqueue(object : Callback<WordResponse> {
@@ -358,9 +353,8 @@ class Play : AppCompatActivity() {
         })
     }
 
-    // NEW FUNCTION: Logic to select the next word from the local list
+    // Logic to select the next word from the local list
     private fun useFallbackWord() {
-        // Determine the preferences file name based on the current user ID
         val prefsNameWithId = "${BASE_PREFS_NAME}_${currentUserId}"
         val prefs = getSharedPreferences(prefsNameWithId, Context.MODE_PRIVATE)
 
