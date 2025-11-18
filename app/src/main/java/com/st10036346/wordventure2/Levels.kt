@@ -12,7 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import com.google.firebase.auth.FirebaseAuth // ADDED: Firebase Auth import
+import com.google.firebase.auth.FirebaseAuth 
 import com.st10036346.wordventure2.R
 import com.st10036346.wordventure2.databinding.ActivityLevelsBinding
 
