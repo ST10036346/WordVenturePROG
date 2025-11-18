@@ -13,6 +13,12 @@
         <item>English</item>
         <item>Afrikaans</item>
         <item>Zulu</item>
+
+<!--Title: Support Different Languages and Cultures
+        Name: Android Developers
+        Date: 2025
+        URL: https://developer.android.com/training/basics/supporting-devices/languages-->
+        
     </string-array>
 
     <string name="welcome_to">WELCOME TO</string>
